@@ -13,14 +13,14 @@
       <div class="form-field">
         <input
           type="email"
-          id="username"
-          formControlName="username"
+          id="email"
+          formControlName="email"
           placeholder="Enter your email"
-          [class.is-invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
+          [class.is-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
         >
-        <div class="error-message" *ngIf="loginForm.get('username')?.touched">
-          <span *ngIf="loginForm.get('username')?.errors?.['required']">Email is required</span>
-          <span *ngIf="loginForm.get('username')?.errors?.['email']">Please enter a valid email</span>
+        <div class="error-message" *ngIf="loginForm.get('email')?.touched">
+          <span *ngIf="loginForm.get('email')?.errors?.['required']">Email is required</span>
+          <span *ngIf="loginForm.get('email')?.errors?.['email']">Please enter a valid email</span>
         </div>
       </div>
 
