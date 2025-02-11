@@ -15,8 +15,10 @@ export class ApiService {
   private createHeaders(): HttpHeaders {
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      // Add any default headers here
-      // 'Authorization': `Bearer ${this.getToken()}`
+      'Accept': '*/*',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token'
     });
   }
 
@@ -44,7 +46,11 @@ export class ApiService {
 
   post<T>(controller: string, action?: string, body: any = {}): Observable<T> {
     const headers = this.createHeaders();
-    return this.http.post<T>(this.createUrl(controller, action), body, { headers })
+    const options = {
+      headers: headers,
+      withCredentials: false
+    };
+    return this.http.post<T>(this.createUrl(controller, action), body, options)
       .pipe(catchError(this.handleError));
   }
 
