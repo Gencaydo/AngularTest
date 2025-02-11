@@ -1,4 +1,4 @@
-.login-container {
+.register-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -7,7 +7,7 @@
   padding: 20px;
 }
 
-.login-box {
+.register-box {
   background: white;
   border-radius: 20px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
@@ -16,23 +16,23 @@
   max-width: 480px;
 }
 
-.login-header {
+.register-header {
   text-align: center;
   margin-bottom: 40px;
 }
 
-.login-header h2 {
+.register-header h2 {
   color: #2d3748;
   font-size: 28px;
   margin-bottom: 8px;
 }
 
-.login-header p {
+.register-header p {
   color: #718096;
   font-size: 16px;
 }
 
-.login-form {
+.register-form {
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -43,15 +43,6 @@
   flex-direction: column;
   gap: 8px;
   width: 100%;
-}
-
-.form-field label {
-  color: #4a5568;
-  font-size: 14px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .form-field input {
@@ -91,54 +82,6 @@
   padding: 0;
 }
 
-.form-options {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: -8px;
-}
-
-.remember-me {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #4a5568;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.forgot-password {
-  color: #667eea;
-  font-size: 14px;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.forgot-password:hover {
-  text-decoration: underline;
-}
-
-.login-button {
-  background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 14px;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.login-button:hover {
-  background: #5a67d8;
-}
-
-.login-button:disabled {
-  background: #a0aec0;
-  cursor: not-allowed;
-}
-
 .error-message {
   color: #c53030;
   font-size: 0.875rem;
@@ -152,92 +95,45 @@
   font-size: 12px;
 }
 
-.login-footer {
+.register-button {
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.register-button:hover {
+  background: #5a67d8;
+}
+
+.register-button:disabled {
+  background: #a0aec0;
+  cursor: not-allowed;
+}
+
+.register-footer {
   margin-top: 32px;
   text-align: center;
 }
 
-.login-footer p {
+.register-footer p {
   color: #4a5568;
   font-size: 14px;
 }
 
-.login-footer a {
+.register-footer a {
   color: #667eea;
   text-decoration: none;
   font-weight: 500;
 }
 
-.login-footer a:hover {
+.register-footer a:hover {
   text-decoration: underline;
-}
-
-.social-login {
-  margin-top: 24px;
-}
-
-.social-login p {
-  color: #718096;
-  font-size: 14px;
-  margin-bottom: 16px;
-}
-
-.social-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-}
-
-.social-button {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 2px solid #e2e8f0;
-  background: white;
-  color: #4a5568;
-  font-size: 20px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.social-button:hover {
-  border-color: #667eea;
-  color: #667eea;
-}
-
-.social-button.google {
-  background: #fff;
-  border-color: #ddd;
-  color: #444;
-}
-
-.social-button.google:hover {
-  background: #f1f1f1;
-  border-color: #666;
-}
-
-.social-button.loading {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.spinner {
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: white;
-  animation: spin 1s linear infinite;
-  margin: 0 auto;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .alert {
@@ -279,14 +175,24 @@
   opacity: 1;
 }
 
-@media (max-width: 480px) {
-  .login-box {
-    padding: 24px;
-  }
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
 
-  .form-options {
-    flex-direction: column;
-    gap: 16px;
-    align-items: flex-start;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .register-box {
+    padding: 24px;
   }
 } 

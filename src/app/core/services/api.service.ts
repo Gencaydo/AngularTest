@@ -61,17 +61,21 @@ export class ApiService {
   }
 
   private handleError(error: any) {
-    let errorMessage = 'An error occurred';
-    
     if (error.error instanceof ErrorEvent) {
       // Client-side error
-      errorMessage = error.error.message;
+      return throwError(() => error.error.message);
     } else {
       // Server-side error
-      errorMessage = error.error?.message || error.message || errorMessage;
-    }
+      const errorResponse = error.error;
+      let errorMessage = 'An unexpected error occurred';
+      
+      if (errorResponse?.error?.errors && errorResponse.error.errors.length > 0) {
+        // Get the first error message from the errors array
+        errorMessage = errorResponse.error.errors[0];
+      }
 
-    console.error('API Error:', error);
-    return throwError(() => errorMessage);
+      console.error('API Error:', error);
+      return throwError(() => errorMessage);
+    }
   }
 } 

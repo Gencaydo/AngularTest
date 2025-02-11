@@ -6,8 +6,12 @@
     </div>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-      <div class="alert alert-danger" *ngIf="errorMessage">
+      <div *ngIf="errorMessage" class="alert alert-danger" (click)="clearError()">
+        <i class="fas fa-exclamation-circle"></i>
         {{ errorMessage }}
+        <button type="button" class="close-alert" aria-label="Close">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
 
       <div class="form-field">
@@ -58,7 +62,7 @@
     </form>
 
     <div class="login-footer">
-      <p>Don't have an account? <a routerLink="/register">Sign Up</a></p>
+      <p>Don't have an account? <a [routerLink]="['/register']">Sign Up</a></p>
       <div class="social-login">
         <p>Or continue with</p>
         <div class="social-buttons">

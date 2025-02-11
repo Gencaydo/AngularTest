@@ -1,8 +1,8 @@
 export interface ApiResponse<T> {
-    success: boolean;
-    message: string;
-    data?: T;
-    errors?: string[];
-    statusCode?: number;
-    timestamp?: string;
+    data: T | null;
+    statusCode: number;
+    error?: {
+        errors: string[];
+        isShow: boolean;
+    };
 } 
