@@ -1,0 +1,96 @@
+<div class="profile-container">
+  <div class="profile-box">
+    <div class="profile-header">
+      <div class="profile-icon">
+        <i class="fas fa-user-circle"></i>
+      </div>
+      <h2>My Profile</h2>
+      <p>Manage your personal information</p>
+    </div>
+
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+      <div *ngIf="errorMessage" class="alert alert-danger" (click)="clearError()">
+        <i class="fas fa-exclamation-circle"></i>
+        {{ errorMessage }}
+        <button type="button" class="close-alert" aria-label="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div *ngIf="successMessage" class="alert alert-success">
+        <i class="fas fa-check-circle"></i>
+        {{ successMessage }}
+      </div>
+
+      <div class="form-field">
+        <label for="userName">Username</label>
+        <input
+          type="text"
+          id="userName"
+          formControlName="userName"
+          [class.is-invalid]="profileForm.get('userName')?.invalid && profileForm.get('userName')?.touched"
+        >
+        <div class="error-message" *ngIf="profileForm.get('userName')?.touched && profileForm.get('userName')?.invalid">
+          <span *ngIf="profileForm.get('userName')?.errors?.['required']">Username is required</span>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          [class.is-invalid]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched"
+        >
+        <div class="error-message" *ngIf="profileForm.get('email')?.touched && profileForm.get('email')?.invalid">
+          <span *ngIf="profileForm.get('email')?.errors?.['required']">Email is required</span>
+          <span *ngIf="profileForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="firstName">First Name</label>
+          <input
+            type="text"
+            id="firstName"
+            formControlName="firstName"
+            placeholder="Enter your first name"
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="lastName">Last Name</label>
+          <input
+            type="text"
+            id="lastName"
+            formControlName="lastName"
+            placeholder="Enter your last name"
+          >
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="phoneNumber">Phone Number</label>
+        <input
+          type="tel"
+          id="phoneNumber"
+          formControlName="phoneNumber"
+          placeholder="Enter your phone number"
+        >
+      </div>
+
+      <div class="button-group">
+        <button type="submit" class="save-button" [disabled]="!profileForm.valid || loading">
+          <span *ngIf="!loading">Save Changes</span>
+          <div class="spinner" *ngIf="loading"></div>
+        </button>
+        <button type="button" class="cancel-button" (click)="goBack()">
+          <i class="fas fa-arrow-left"></i>
+          Back to Dashboard
+        </button>
+      </div>
+    </form>
+  </div>
+</div> 

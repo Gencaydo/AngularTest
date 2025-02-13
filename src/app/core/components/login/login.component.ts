@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { LoginService } from '../../services/login.service';
 import { GoogleAuthService } from '../../services/google-auth.service';
 import { CommonModule } from '@angular/common';
+import { AuthStateService } from '../../services/auth-state.service';
 
 @Component({
   selector: 'app-login',
@@ -23,8 +24,14 @@ export class LoginComponent implements OnInit {
     private formBuilder: FormBuilder,
     private loginService: LoginService,
     private googleAuthService: GoogleAuthService,
-    private router: Router
+    private router: Router,
+    private authState: AuthStateService
   ) {
+    // Redirect if already logged in
+    if (this.authState.isAuthenticated()) {
+      this.router.navigate(['/index']);
+    }
+
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -54,19 +61,25 @@ export class LoginComponent implements OnInit {
       this.loading = true;
       this.errorMessage = '';
 
-      this.loginService.login(this.loginForm.value).subscribe({
+      const credentials = {
+        email: this.loginForm.get('email')?.value,
+        password: this.loginForm.get('password')?.value
+      };
+
+      this.loginService.login(credentials).subscribe({
         next: (response) => {
+          console.log('Response:', response); // Debug log
           if (response.statusCode === 200 && response.data) {
-            localStorage.setItem('loginData', JSON.stringify({
-              message: 'Login successful!',
-              email: this.loginForm.get('email')?.value
-            }));
+            // Store user info if needed
+            localStorage.setItem('userEmail', credentials.email);
+            // Navigate to index
             this.router.navigate(['/index'], { replaceUrl: true });
           } else if (response.error?.errors) {
             this.errorMessage = response.error.errors[0];
           }
         },
         error: (error) => {
+          console.error('Login Error:', error); // Debug log
           this.errorMessage = error;
           this.loading = false;
           this.isSubmitting = false;

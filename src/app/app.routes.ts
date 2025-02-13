@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './core/components/login/login.component';
 import { RegisterComponent } from './core/components/register/register.component';
 import { IndexComponent } from './core/components/index/index.component';
+import { ProfileComponent } from './core/components/profile/profile.component';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { 
@@ -19,7 +21,13 @@ export const routes: Routes = [
   },
   { 
     path: 'index', 
-    component: IndexComponent 
+    component: IndexComponent,
+    canActivate: [authGuard]
+  },
+  { 
+    path: 'profile', 
+    component: ProfileComponent,
+    canActivate: [authGuard]
   },
   { 
     path: '**', 
