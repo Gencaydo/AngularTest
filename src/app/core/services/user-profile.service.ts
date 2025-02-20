@@ -4,6 +4,7 @@ import { ApiService } from './api.service';
 import { ApiResponse } from '../models/api-response.model';
 import { UserProfile } from '../models/user-profile.model';
 import { AppStateService } from './app-state.service';
+import { AuthStateService } from './auth-state.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,12 +14,16 @@ export class UserProfileService {
 
   constructor(
     private apiService: ApiService,
-    private appState: AppStateService
+    private appState: AppStateService,
+    private authStateService: AuthStateService
   ) { }
 
   getUserProfile(): Observable<ApiResponse<UserProfile>> {
     this.appState.setLoading(true);
-    return this.apiService.get<ApiResponse<UserProfile>>(this.controller, 'GetUser')
+    const user = this.authStateService.getUser();
+    const params = { email: user?.userName};
+    
+    return this.apiService.get<ApiResponse<UserProfile>>(this.controller, 'GetUser', params)
       .pipe(
         tap({
           next: (response) => {
