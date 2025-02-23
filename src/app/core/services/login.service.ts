@@ -22,7 +22,7 @@ export class LoginService {
         tap(response => {
           console.log('Login Response:', response); // Debug log
           if (response.statusCode === 200 && response.data) {
-            this.authState.login(response.data.token, {
+            this.authState.login(response.data.accessToken, {
               email: credentials.email,
               userName: response.data.userName || credentials.email
             });

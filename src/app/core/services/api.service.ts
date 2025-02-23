@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import { Observable, from, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { AuthStateService } from './auth-state.service';
 
@@ -10,28 +10,72 @@ import { AuthStateService } from './auth-state.service';
 })
 export class ApiService {
   private baseUrl = environment.apiUrl;
+  private axiosInstance: AxiosInstance;
 
-  constructor(
-    private http: HttpClient,
-    private authState: AuthStateService
-  ) { }
-
-  private createHeaders(): HttpHeaders {
-    const token = this.authState.getToken();
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Accept': '*/*'
+  constructor(private authState: AuthStateService) {
+    this.axiosInstance = axios.create({
+      baseURL: this.baseUrl,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Origin, Content-Type, Accept, Authorization, X-Request-With'
+      },
+      withCredentials: false
     });
 
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
-    }
+    // Add request interceptor for auth token and logging
+    this.axiosInstance.interceptors.request.use(config => {
+      const token = this.authState.getToken();
+      if (token) {
+        // Ensure headers object exists
+        config.headers = config.headers || {};
+        // Set Authorization header
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      // Enhanced logging
+      console.log('API Request Details:', {
+        fullUrl: `${config.baseURL}${config.url}`,
+        url: config.url,
+        method: config.method,
+        params: config.params,
+        baseURL: config.baseURL,
+        headers: config.headers
+      });
+      
+      return config;
+    }, error => {
+      // Handle request errors
+      console.error('Request Configuration Error:', error);
+      return Promise.reject(error);
+    });
 
-    return headers;
+    // Add response interceptor for debugging
+    this.axiosInstance.interceptors.response.use(
+      response => {
+        console.log('API Response:', {
+          status: response.status,
+          data: response.data,
+          headers: response.headers
+        });
+        return response;
+      },
+      error => {
+        console.error('API Error Response:', {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          headers: error.response?.headers
+        });
+        return Promise.reject(error);
+      }
+    );
   }
 
   private createUrl(controller: string, action?: string): string {
-    let url = `${this.baseUrl}/${controller}`;
+    let url = `/${controller}`;
     if (action) {
       url += `/${action}`;
     }
@@ -39,57 +83,69 @@ export class ApiService {
   }
 
   get<T>(controller: string, action?: string, params: any = {}): Observable<T> {
-    const headers = this.createHeaders();
-    let httpParams = new HttpParams();
-    
-    for (const key in params) {
-      if (params.hasOwnProperty(key)) {
-        httpParams = httpParams.set(key, params[key]);
-      }
-    }
-
-    return this.http.get<T>(this.createUrl(controller, action), { headers, params: httpParams })
-      .pipe(catchError(this.handleError));
+    return from(
+      this.axiosInstance.get<T>(this.createUrl(controller, action), { params })
+    ).pipe(
+      catchError(this.handleError)
+    ).pipe(
+      // Extract the data from the axios response
+      map((response: AxiosResponse<T>) => response.data)
+    );
   }
 
   post<T>(controller: string, action?: string, body: any = {}): Observable<T> {
-    const headers = this.createHeaders();
-    const options = {
-      headers: headers,
-      withCredentials: false
-    };
-    return this.http.post<T>(this.createUrl(controller, action), body, options)
-      .pipe(catchError(this.handleError));
+    return from(
+      this.axiosInstance.post<T>(this.createUrl(controller, action), body)
+    ).pipe(
+      catchError(this.handleError)
+    ).pipe(
+      map((response: AxiosResponse<T>) => response.data)
+    );
   }
 
   put<T>(controller: string, action?: string, body: any = {}): Observable<T> {
-    const headers = this.createHeaders();
-    return this.http.put<T>(this.createUrl(controller, action), body, { headers })
-      .pipe(catchError(this.handleError));
+    return from(
+      this.axiosInstance.put<T>(this.createUrl(controller, action), body)
+    ).pipe(
+      catchError(this.handleError)
+    ).pipe(
+      map((response: AxiosResponse<T>) => response.data)
+    );
   }
 
   delete<T>(controller: string, action?: string, body: any = {}): Observable<T> {
-    const headers = this.createHeaders();
-    return this.http.delete<T>(this.createUrl(controller, action), { headers })
-      .pipe(catchError(this.handleError));
+    return from(
+      this.axiosInstance.delete<T>(this.createUrl(controller, action), { data: body })
+    ).pipe(
+      catchError(this.handleError)
+    ).pipe(
+      map((response: AxiosResponse<T>) => response.data)
+    );
   }
 
   private handleError(error: any) {
-    if (error.error instanceof ErrorEvent) {
-      // Client-side error
-      return throwError(() => error.error.message);
-    } else {
-      // Server-side error
-      const errorResponse = error.error;
+    if (error.isAxiosError) {
+      // Log the full error details
+      console.error('API Error Details:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        params: error.config?.params,
+        status: error.response?.status,
+        data: error.response?.data
+      });
+
+      const errorResponse = error.response?.data;
       let errorMessage = 'An unexpected error occurred';
       
       if (errorResponse?.error?.errors && errorResponse.error.errors.length > 0) {
-        // Get the first error message from the errors array
         errorMessage = errorResponse.error.errors[0];
+      } else if (error.response?.status === 404) {
+        errorMessage = `API endpoint not found: ${error.config?.url}`;
       }
 
-      console.error('API Error:', error);
       return throwError(() => errorMessage);
     }
+    
+    return throwError(() => error.message || 'An unexpected error occurred');
   }
 } 
