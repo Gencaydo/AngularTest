@@ -6,7 +6,7 @@ import { LoginService } from '../../services/login.service';
 @Component({
   selector: 'app-index',
   templateUrl: './index.component.html',
-  styleUrls: ['./index.component.css'],
+  styleUrls: ['./index.component.scss'],
   standalone: true,
   imports: [CommonModule]
 })
@@ -19,7 +19,7 @@ export class IndexComponent implements OnInit {
     private loginService: LoginService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     // Get the login response data from localStorage
     const loginData = localStorage.getItem('loginData');
     if (loginData) {

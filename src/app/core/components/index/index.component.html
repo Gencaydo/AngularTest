@@ -1,37 +1,101 @@
-<div class="index-container">
-  <div class="welcome-section">
-    <div class="success-icon">
-      <i class="fas fa-check-circle"></i>
+<div class="dashboard-container">
+  <!-- Stats Cards -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon active">
+        <i class="fas fa-chart-line"></i>
+      </div>
+      <div class="stat-info">
+        <h2>23%</h2>
+        <p>ACTIVE USER</p>
+      </div>
     </div>
-    <h1>Welcome to Dashboard</h1>
-    <div class="success-message">
-      {{ welcomeMessage }}
+
+    <div class="stat-card">
+      <div class="stat-icon down">
+        <i class="fas fa-chart-bar"></i>
+      </div>
+      <div class="stat-info">
+        <h2>15%</h2>
+        <p>DOWN RATE</p>
+      </div>
     </div>
-    <div class="user-info" *ngIf="userEmail">
-      <i class="fas fa-user"></i>
-      <span>{{ userEmail }}</span>
+
+    <div class="stat-card">
+      <div class="stat-icon sale">
+        <i class="fas fa-chart-pie"></i>
+      </div>
+      <div class="stat-info">
+        <h2>35%</h2>
+        <p>SALE RATIO</p>
+      </div>
     </div>
   </div>
 
-  <div class="quick-actions">
-    <h2>Quick Actions</h2>
-    <div class="action-grid">
-      <button class="action-button">
-        <i class="fas fa-home"></i>
-        <span>Home</span>
-      </button>
-      <button class="action-button" (click)="navigateToProfile()">
-        <i class="fas fa-user"></i>
-        <span>Profile</span>
-      </button>
-      <button class="action-button">
-        <i class="fas fa-cog"></i>
-        <span>Settings</span>
-      </button>
-      <button class="action-button" (click)="onLogout()">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Logout</span>
-      </button>
+  <!-- Profile and Product Details Section -->
+  <div class="content-row">
+    <!-- Profile Card -->
+    <div class="profile-card">
+      <div class="profile-image">
+        <img src="assets/images/profile-placeholder.jpg" alt="Profile">
+      </div>
+      <h3>Gregory Johnes</h3>
+      <p class="location">Califonia, USA</p>
+      
+      <div class="stats-grid">
+        <div class="stat-item">
+          <h4>345</h4>
+          <p>Followers</p>
+        </div>
+        <div class="stat-item">
+          <h4>40</h4>
+          <p>Following</p>
+        </div>
+        <div class="stat-item">
+          <h4>12</h4>
+          <p>Questions</p>
+        </div>
+        <div class="stat-item">
+          <h4>40</h4>
+          <p>Answers</p>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn-follow">Follow</button>
+        <button class="btn-message">Message</button>
+      </div>
     </div>
+
+    <!-- Product Details Table -->
+    <div class="product-details">
+      <h3>PRODUCT DETAIL</h3>
+      <table class="product-table">
+        <thead>
+          <tr>
+            <th>PRODUCT</th>
+            <th>QUANTITY</th>
+            <th>TOTAL</th>
+            <th>DELIVERY</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let i of [1,2,3,4]">
+            <td>Awesome T-shirt</td>
+            <td>24</td>
+            <td><span class="price">${{550}}</span></td>
+            <td>Moscow,Lenina 44-1</td>
+            <td><button class="btn-view">View</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- News Section -->
+  <div class="news-section">
+    <h3 class="news-title">Awesome News Title</h3>
+    <!-- Add news content here -->
   </div>
 </div> 
