@@ -1,6 +1,39 @@
 .dashboard-container {
   padding: 20px;
   
+  .nav-bar {
+    background: white;
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: flex-end;
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+
+      .nav-link {
+        color: #495057;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: color 0.3s;
+
+        i {
+          font-size: 16px;
+        }
+
+        &:hover {
+          color: #556ee6;
+        }
+      }
+    }
+  }
+
   .stats-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
