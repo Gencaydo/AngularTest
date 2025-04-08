@@ -23,7 +23,7 @@ export class UserProfileService {
     const user = this.authStateService.getUser();
     const params = { email: user?.userName};
     
-    return this.apiService.get<ApiResponse<UserProfile>>(this.controller, 'GetUser', params)
+    return this.apiService.get<ApiResponse<UserProfile>>(this.controller, 'GetUserByEmail', params)
       .pipe(
         tap({
           next: (response) => {
