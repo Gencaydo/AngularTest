@@ -46,7 +46,20 @@ export class UserProfileService {
 
   updateUserProfile(userData: Partial<UserProfile>): Observable<ApiResponse<UserProfile>> {
     this.appState.setLoading(true);
-    return this.apiService.put<ApiResponse<UserProfile>>(this.controller, 'UpdateUser', userData)
+    // Get the current user profile from app state
+    const currentProfile = this.appState.getCurrentState().userProfile;
+    if (!currentProfile?.id) {
+      this.appState.setLoading(false);
+      throw new Error('User profile not found');
+    }
+
+    // Add the user ID to the update data
+    const updateData = {
+      ...userData,
+      id: currentProfile.id
+    };
+
+    return this.apiService.put<ApiResponse<UserProfile>>(this.controller, 'Update', updateData)
       .pipe(
         tap({
           next: (response) => {
@@ -56,6 +69,7 @@ export class UserProfileService {
             this.appState.setLoading(false);
           },
           error: (error) => {
+            console.error('Profile update error:', error);
             this.appState.setError(error);
             this.appState.setLoading(false);
           }
