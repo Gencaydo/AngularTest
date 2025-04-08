@@ -25,7 +25,7 @@ export class ProfileComponent implements OnInit {
     private router: Router
   ) {
     this.profileForm = this.formBuilder.group({
-      userName: ['', Validators.required],
+      userName: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9]*$')]],
       email: ['', [Validators.required, Validators.email]],
       firstName: [''],
       lastName: [''],
@@ -39,15 +39,24 @@ export class ProfileComponent implements OnInit {
 
   loadUserProfile() {
     this.loading = true;
+    this.errorMessage = '';
     this.userProfileService.getUserProfile().subscribe({
       next: (response) => {
         if (response.data) {
           this.userProfile = response.data;
-          this.profileForm.patchValue(response.data);
+          // Ensure we're not setting empty values
+          const formData = {
+            userName: response.data.userName || '',
+            email: response.data.email || '',
+            firstName: response.data.firstName || '',
+            lastName: response.data.lastName || '',
+            phoneNumber: response.data.phoneNumber || ''
+          };
+          this.profileForm.patchValue(formData);
         }
       },
       error: (error) => {
-        this.errorMessage = error;
+        this.errorMessage = error.message || 'Failed to load user profile';
       },
       complete: () => {
         this.loading = false;
@@ -61,7 +70,15 @@ export class ProfileComponent implements OnInit {
       this.errorMessage = '';
       this.successMessage = '';
 
-      this.userProfileService.updateUserProfile(this.profileForm.value).subscribe({
+      const formData = this.profileForm.value;
+      // Ensure we're not sending empty values
+      if (!formData.userName || !formData.email) {
+        this.errorMessage = 'Username and email are required';
+        this.loading = false;
+        return;
+      }
+
+      this.userProfileService.updateUserProfile(formData).subscribe({
         next: (response) => {
           if (response.data) {
             this.successMessage = 'Profile updated successfully';
@@ -69,10 +86,18 @@ export class ProfileComponent implements OnInit {
           }
         },
         error: (error) => {
-          this.errorMessage = error;
+          this.errorMessage = error.message || 'Failed to update profile';
         },
         complete: () => {
           this.loading = false;
+        }
+      });
+    } else {
+      this.errorMessage = 'Please fill in all required fields correctly';
+      Object.keys(this.profileForm.controls).forEach(key => {
+        const control = this.profileForm.get(key);
+        if (control?.invalid) {
+          control.markAsTouched();
         }
       });
     }

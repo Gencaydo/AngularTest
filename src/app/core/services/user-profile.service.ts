@@ -21,7 +21,11 @@ export class UserProfileService {
   getUserProfile(): Observable<ApiResponse<UserProfile>> {
     this.appState.setLoading(true);
     const user = this.authStateService.getUser();
-    const params = { email: user?.userName};
+    if (!user?.email) {
+      this.appState.setLoading(false);
+      throw new Error('User email not found');
+    }
+    const params = { email: user.email };
     
     return this.apiService.post<ApiResponse<UserProfile>>(this.controller, 'GetUserByEmail', params)
       .pipe(
