@@ -59,7 +59,7 @@ export class UserProfileService {
       id: currentProfile.id
     };
 
-    return this.apiService.put<ApiResponse<UserProfile>>(this.controller, 'Update', updateData)
+    return this.apiService.put<ApiResponse<UserProfile>>(this.controller, 'UpdateUser', updateData)
       .pipe(
         tap({
           next: (response) => {
