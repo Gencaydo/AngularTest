@@ -39,7 +39,6 @@ export class AuthStateService {
   }
 
   login(token: string, user: { email: string; userName: string }) {
-    console.log('Login with token:', token); // Debug log
     const newState = {
       isAuthenticated: true,
       token,
@@ -49,7 +48,6 @@ export class AuthStateService {
   }
 
   logout() {
-    console.log('Logging out...'); // Debug log
     localStorage.removeItem('authState');
     localStorage.removeItem('loginData');
     localStorage.removeItem('userEmail');
