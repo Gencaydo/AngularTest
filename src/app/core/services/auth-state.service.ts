@@ -33,7 +33,6 @@ export class AuthStateService {
   }
 
   private saveState(state: AuthState) {
-    console.log('Saving auth state:', state); // Debug log
     localStorage.setItem('authState', JSON.stringify(state));
     this.authState.next(state);
   }
