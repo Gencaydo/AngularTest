@@ -11,7 +11,7 @@ declare module 'crypto-js' {
   providedIn: 'root'
 })
 export class TokenService {
-  private static readonly encryptionKey = 'YourStrongEncryptionKey123';
+  private static readonly encryptionKey = 'doyouwannacreateaspecialky190219';
 
   static decryptToken(token: string): string {
     try {
