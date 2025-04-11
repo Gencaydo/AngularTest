@@ -1,0 +1,33 @@
+.sidebar {
+  // ... existing code ...
+
+  .nav-item {
+    // ... existing code ...
+
+    &.logout {
+      margin-top: auto;
+      padding: 10px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+      }
+
+      a {
+        color: #fff;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+
+        i {
+          font-size: 18px;
+        }
+      }
+    }
+  }
+} 
