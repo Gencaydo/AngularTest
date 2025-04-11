@@ -80,9 +80,6 @@ export class ProfileComponent implements OnInit {
       this.successMessage = '';
 
       const formData = this.profileForm.value;
-      console.log('Form Data Before Update:', formData);
-      console.log('First Name Before Update:', formData.firstName);
-      console.log('Mobile Phone Before Update:', formData.mobilePhoneNumber);
       
       // Ensure we're not sending empty values for required fields
       if (!formData.userName || !formData.email) {
@@ -101,17 +98,13 @@ export class ProfileComponent implements OnInit {
         mobilePhoneNumber: formData.mobilePhoneNumber || ''
       };
 
-      console.log('Data Being Sent to API:', updateData);
-
       this.userProfileService.updateUserProfile(updateData).subscribe({
         next: (response) => {
-          console.log('Update Response:', response);
           if (response.data) {
             this.successMessage = 'Profile updated successfully';
             this.userProfile = response.data;
             this.userName = response.data.userName || '';
             this.email = response.data.email || '';
-            console.log('Updated User Profile:', this.userProfile);
             // Update form with the response data
             const updatedFormData = {
               id: response.data.id || '',
@@ -121,9 +114,7 @@ export class ProfileComponent implements OnInit {
               lastName: response.data.lastName || '',
               mobilePhoneNumber: response.data.mobilePhoneNumber || ''
             };
-            console.log('Updated Form Data:', updatedFormData);
             this.profileForm.setValue(updatedFormData);
-            console.log('Form Values After Update:', this.profileForm.value);
           }
         },
         error: (error) => {

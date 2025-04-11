@@ -20,7 +20,6 @@ export class LoginService {
     return this.apiService.post<ApiResponse<any>>(this.controller, 'CreateToken', credentials)
       .pipe(
         tap(response => {
-          console.log('Login Response:', response); // Debug log
           if (response.statusCode === 200 && response.data) {
             this.authState.login(response.data.accessToken, {
               email: credentials.email,
@@ -42,16 +41,6 @@ export class LoginService {
         this.authState.logout();
       })
     );
-
-    // If you have a logout endpoint, use this instead:
-    /*
-    return this.apiService.post<ApiResponse<void>>(this.controller, 'logout')
-      .pipe(
-        tap(() => {
-          this.authState.logout();
-        })
-      );
-    */
   }
 
   refreshToken(): Observable<ApiResponse<any>> {

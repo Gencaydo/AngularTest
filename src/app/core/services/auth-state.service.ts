@@ -33,13 +33,11 @@ export class AuthStateService {
   }
 
   private saveState(state: AuthState) {
-    console.log('Saving auth state:', state); // Debug log
     localStorage.setItem('authState', JSON.stringify(state));
     this.authState.next(state);
   }
 
   login(token: string, user: { email: string; userName: string }) {
-    console.log('Login with token:', token); // Debug log
     const newState = {
       isAuthenticated: true,
       token,
@@ -49,7 +47,6 @@ export class AuthStateService {
   }
 
   logout() {
-    console.log('Logging out...'); // Debug log
     localStorage.removeItem('authState');
     localStorage.removeItem('loginData');
     localStorage.removeItem('userEmail');

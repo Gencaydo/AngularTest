@@ -38,13 +38,11 @@ export class GoogleAuthService {
 
   private handleCredentialResponse(response: any) {
     // Send the token to your backend
-    console.log("Google token:", response.credential);
     this.authenticateWithBackend(response.credential).subscribe(
       (response) => {
         if (response.success) {
           // Store email from response if needed
           localStorage.setItem('email', response.data.email);
-          console.log('Authentication successful:', response);
         }
       },
       (error) => {
