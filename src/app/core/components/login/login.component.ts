@@ -68,7 +68,6 @@ export class LoginComponent implements OnInit {
 
       this.loginService.login(credentials).subscribe({
         next: (response) => {
-          console.log('Response:', response); // Debug log
           if (response.statusCode === 200 && response.data) {
             // Store user info if needed
             localStorage.setItem('userEmail', credentials.email);
@@ -79,7 +78,6 @@ export class LoginComponent implements OnInit {
           }
         },
         error: (error) => {
-          console.error('Login Error:', error); // Debug log
           this.errorMessage = error;
           this.loading = false;
           this.isSubmitting = false;
