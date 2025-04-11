@@ -50,7 +50,6 @@ export class ProfileComponent implements OnInit {
     this.errorMessage = '';
     this.userProfileService.getUserProfile().subscribe({
       next: (response: ApiResponse<UserProfile>) => {
-        console.log('Profile response:', response);
         if (response && response.data) {
           const userData = response.data;
           this.profileForm.patchValue({

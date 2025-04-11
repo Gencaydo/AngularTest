@@ -35,16 +35,6 @@ export class ApiService {
         config.headers['Authorization'] = `Bearer ${token}`;
       }
       
-      // Enhanced logging
-      console.log('API Request Details:', {
-        fullUrl: `${config.baseURL}${config.url}`,
-        url: config.url,
-        method: config.method,
-        params: config.params,
-        baseURL: config.baseURL,
-        headers: config.headers
-      });
-      
       return config;
     }, error => {
       // Handle request errors
@@ -55,11 +45,6 @@ export class ApiService {
     // Add response interceptor for debugging
     this.axiosInstance.interceptors.response.use(
       response => {
-        console.log('API Response:', {
-          status: response.status,
-          data: response.data,
-          headers: response.headers
-        });
         return response;
       },
       error => {
