@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { TokenService } from './token-decryption.service';  
+import { BehaviorSubject, Observable } from 'rxjs'; 
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -39,10 +38,9 @@ export class AuthStateService {
   }
 
   login(token: string, user: { email: string; userName: string }) {
-    const decryptedtoken = TokenService.decryptToken(token);
     const newState: AuthState = {
       isAuthenticated: true,
-      token: decryptedtoken,
+      token,
       user
     };
     this.saveState(newState);
