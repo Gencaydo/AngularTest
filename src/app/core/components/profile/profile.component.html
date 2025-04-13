@@ -12,16 +12,24 @@
         <p class="user-email">{{ email }}</p>
       </div>
 
-      <form [formGroup]="profileForm" class="profile-form">
+      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
         <div class="form-grid">
           <div class="form-group">
             <label for="firstName">First Name</label>
             <input type="text" id="firstName" formControlName="firstName" placeholder="Enter your first name">
+            <div class="error-message" *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched">
+              <small *ngIf="profileForm.get('firstName')?.hasError('required')">First name is required</small>
+              <small *ngIf="profileForm.get('firstName')?.hasError('minlength')">First name must be at least 2 characters</small>
+            </div>
           </div>
 
           <div class="form-group">
             <label for="lastName">Last Name</label>
             <input type="text" id="lastName" formControlName="lastName" placeholder="Enter your last name">
+            <div class="error-message" *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched">
+              <small *ngIf="profileForm.get('lastName')?.hasError('required')">Last name is required</small>
+              <small *ngIf="profileForm.get('lastName')?.hasError('minlength')">Last name must be at least 2 characters</small>
+            </div>
           </div>
 
           <div class="form-group">
@@ -32,12 +40,16 @@
           <div class="form-group">
             <label for="mobilePhoneNumber">Mobile Phone</label>
             <input type="tel" id="mobilePhoneNumber" formControlName="mobilePhoneNumber" placeholder="Enter your mobile phone">
+            <div class="error-message" *ngIf="profileForm.get('mobilePhoneNumber')?.invalid && profileForm.get('mobilePhoneNumber')?.touched">
+              <small *ngIf="profileForm.get('mobilePhoneNumber')?.hasError('required')">Mobile phone is required</small>
+              <small *ngIf="profileForm.get('mobilePhoneNumber')?.hasError('pattern')">Mobile phone must be 10-15 digits, with optional + prefix</small>
+            </div>
           </div>
         </div>
 
         <div class="form-actions">
           <button type="button" class="btn-cancel" (click)="onCancel()">Cancel</button>
-          <button type="submit" class="btn-save" [disabled]="!profileForm.valid || loading" (click)="onSubmit()">
+          <button type="submit" class="btn-save">
             {{ loading ? 'Saving...' : 'Save Changes' }}
           </button>
         </div>
@@ -62,17 +74,19 @@
           </div>
           <div class="stat-info">
             <h4>Last Updated</h4>
-            <p>Today</p>
+            <p>{{ lastUpdated }}</p>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="message-container" *ngIf="errorMessage">
-    <div class="alert error">
-      {{ errorMessage }}
-      <button class="close-btn" (click)="errorMessage = ''">&times;</button>
+  <!-- Full screen success overlay - only shows on successful save -->
+  <div class="success-overlay" *ngIf="showSuccessOverlay">
+    <div class="success-content">
+      <i class="fas fa-check-circle success-icon"></i>
+      <h3>Success!</h3>
+      <p>Your profile has been updated</p>
     </div>
   </div>
 </div> 

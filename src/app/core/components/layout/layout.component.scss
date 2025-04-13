@@ -59,6 +59,14 @@
         background-color: rgba(255, 255, 255, 0.2);
       }
 
+      &[href]:hover,
+      &[routerLink]:hover,
+      &:not([href]):not([routerLink]):hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white;
+        cursor: pointer;
+      }
+
       fa-icon {
         margin-right: 10px;
         width: 20px;

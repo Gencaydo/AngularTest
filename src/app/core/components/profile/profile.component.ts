@@ -15,16 +15,17 @@ import { ApiResponse } from '../../models/api-response.model';
 })
 export class ProfileComponent implements OnInit {
   profileForm: FormGroup;
-  loading = false;
-  errorMessage = '';
-  successMessage = '';
-  userProfile?: UserProfile;
   userName: string = '';
   email: string = '';
   profileImage: string = '';
+  errorMessage: string = '';
+  messageType: 'success' | 'error' = 'error';
+  loading: boolean = false;
+  lastUpdated: string = 'Today';
+  showSuccessOverlay: boolean = false;
 
   // Default profile image as a data URL
-  readonly defaultProfileImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2U5ZWNlZiI+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgM2MyLjY3IDAgNC44NCAyLjE3IDQuODQgNC44NCAwIDIuNjctMi4xNyA4NC00Ljg0IDQuODQtMi42NyAwLTQuODQtMi4xNy00Ljg0LTQuODQgMC0yLjY3IDIuMTctNC44NCA0Ljg0LTQuODR6bTAgMTJhOS45MSA5LjkxIDAgMCAxLTguMDQtNC40MmMxLjU4LTIuMTIgMy42Ni0zLjU4IDYuMDQtMy41OHM0LjQ2IDEuNDYgNi4wNCAzLjU4QTkuOTEgOS45MSAwIDAgMSAxMiAxN3oiLz48L3N2Zz4=';
+  readonly defaultProfileImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2U5ZWNlZiI+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgM2MyLjY3IDAgNC44NCAyLjE3IDQuODQgNC44NCAwIDIuNjctMi4xNyA0Ljg0LTQuODQgNC44NC0yLjY3IDAtNC44NC0yLjE3LTQuODQtNC44NCAwLTIuNjcgMi4xNy00Ljg0IDQuODQtNC44NHptMCAxMmE5LjkxIDkuOTEgMCAwIDEtOC4wNC00LjQyYzEuNTgtMi4xMiAzLjY2LTMuNTggNi4wNC0zLjU4czQuNDYgMS40NiA2LjA0IDMuNThBOS45MSA5LjkxIDAgMCAxIDEyIDE3eiIvPjwvc3ZnPg==';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -32,12 +33,10 @@ export class ProfileComponent implements OnInit {
     private router: Router
   ) {
     this.profileForm = this.formBuilder.group({
-      id: [''],
-      userName: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9]*$')]],
-      email: ['', [Validators.required, Validators.email]],
-      firstName: [''],
-      lastName: [''],
-      mobilePhoneNumber: ['']
+      firstName: ['', [Validators.required, Validators.minLength(2)]],
+      lastName: ['', [Validators.required, Validators.minLength(2)]],
+      email: [{value: '', disabled: true}],
+      mobilePhoneNumber: ['', [Validators.required, Validators.pattern('^\\+?[0-9]{10,15}$')]]
     });
   }
 
@@ -50,6 +49,7 @@ export class ProfileComponent implements OnInit {
     this.errorMessage = '';
     this.userProfileService.getUserProfile().subscribe({
       next: (response: ApiResponse<UserProfile>) => {
+        console.log('Profile response:', response);
         if (response && response.data) {
           const userData = response.data;
           this.profileForm.patchValue({
@@ -61,13 +61,13 @@ export class ProfileComponent implements OnInit {
           this.userName = userData.userName || '';
           this.email = userData.email || '';
           this.profileImage = userData.profileImage || this.defaultProfileImage;
+          this.lastUpdated = this.formatDate(new Date());
         }
+        this.loading = false;
       },
       error: (error: Error) => {
         console.error('Error loading profile:', error);
         this.showMessage('Error loading profile', 'error');
-      },
-      complete: () => {
         this.loading = false;
       }
     });
@@ -77,62 +77,56 @@ export class ProfileComponent implements OnInit {
     if (this.profileForm.valid) {
       this.loading = true;
       this.errorMessage = '';
-      this.successMessage = '';
-
-      const formData = this.profileForm.value;
       
-      // Ensure we're not sending empty values for required fields
-      if (!formData.userName || !formData.email) {
-        this.errorMessage = 'Username and email are required';
-        this.loading = false;
-        return;
-      }
-
-      // Create a complete user profile object
-      const updateData: UserProfile = {
-        id: formData.id,
-        userName: formData.userName,
-        email: formData.email,
-        firstName: formData.firstName || '',
-        lastName: formData.lastName || '',
-        mobilePhoneNumber: formData.mobilePhoneNumber || ''
+      // Get the form values including disabled fields
+      const formData = this.profileForm.getRawValue();
+      
+      // Create the update payload
+      const updateData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email, // Include the email from the disabled field
+        mobilePhoneNumber: formData.mobilePhoneNumber
       };
+
+      console.log('Updating profile with data:', updateData);
 
       this.userProfileService.updateUserProfile(updateData).subscribe({
         next: (response) => {
-          if (response.data) {
-            this.successMessage = 'Profile updated successfully';
-            this.userProfile = response.data;
-            this.userName = response.data.userName || '';
-            this.email = response.data.email || '';
-            // Update form with the response data
-            const updatedFormData = {
-              id: response.data.id || '',
-              userName: response.data.userName || '',
-              email: response.data.email || '',
-              firstName: response.data.firstName || '',
-              lastName: response.data.lastName || '',
-              mobilePhoneNumber: response.data.mobilePhoneNumber || ''
-            };
-            this.profileForm.setValue(updatedFormData);
-          }
+          console.log('Profile update success:', response);
+          // Don't show message in the message container for success
+          this.loading = false;
+          // Update the last updated date
+          this.lastUpdated = this.formatDate(new Date());
+          
+          // Show the success overlay
+          this.showSuccessOverlay = true;
+          setTimeout(() => {
+            this.showSuccessOverlay = false;
+          }, 2000); // Reduced to 2 seconds for the smaller box
+          
+          // Reload user profile to get the latest data
+          this.loadUserProfile();
         },
         error: (error) => {
-          console.error('Update Error:', error);
-          this.errorMessage = error.message || 'Failed to update profile';
-        },
-        complete: () => {
+          console.error('Error updating profile:', error);
+          this.showMessage('Error updating profile: ' + (error.message || 'Unknown error'), 'error');
           this.loading = false;
         }
       });
     } else {
-      this.errorMessage = 'Please fill in all required fields correctly';
+      // Clear any previous success messages
+      this.errorMessage = '';
+      
+      // Mark all fields as touched to show validation errors
       Object.keys(this.profileForm.controls).forEach(key => {
         const control = this.profileForm.get(key);
-        if (control?.invalid) {
+        if (control) {
           control.markAsTouched();
         }
       });
+      
+      this.showMessage('Please fix the validation errors before submitting', 'error');
     }
   }
 
@@ -141,9 +135,42 @@ export class ProfileComponent implements OnInit {
   }
 
   showMessage(message: string, type: 'success' | 'error') {
+    console.log(`Showing ${type} message:`, message);
     this.errorMessage = message;
+    this.messageType = type;
+    
+    // Force the message to be visible for at least 5 seconds
     setTimeout(() => {
+      console.log('Message timeout reached');
       this.errorMessage = '';
     }, 5000);
+    
+    // For debugging - log the state after 1 second
+    setTimeout(() => {
+      console.log('Message state after 1 second:', {
+        message: this.errorMessage,
+        type: this.messageType,
+        isVisible: !!this.errorMessage
+      });
+    }, 1000);
+  }
+
+  // Helper method to format dates
+  private formatDate(date: Date): string {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    if (date.toDateString() === today.toDateString()) {
+      return 'Today';
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return 'Yesterday';
+    } else {
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      });
+    }
   }
 } 
