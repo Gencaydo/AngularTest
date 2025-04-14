@@ -1,0 +1,120 @@
+<div class="product-sales-container">
+  <div class="product-header">
+    <h2 appTranslate="product_sales_operations"></h2>
+    <p appTranslate="product_sales_description"></p>
+  </div>
+
+  <div class="product-content">
+    <!-- Ana içerik kartı -->
+    <div class="product-card">
+      <h3 appTranslate="add_new_sale"></h3>
+      
+      <form [formGroup]="salesForm" (ngSubmit)="addSale()" class="sales-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="productType" appTranslate="product_type"></label>
+            <select id="productType" formControlName="productType" (change)="onProductChange()" class="form-control">
+              <option [ngValue]="null">{{ 'select_product_type' | translate }}</option>
+              <option *ngFor="let productType of productTypes" [ngValue]="productType">
+                {{ productType.name }} - {{ formatCurrency(productType.price) }}
+              </option>
+            </select>
+            <div class="error-message" *ngIf="salesForm.get('productType')?.invalid && salesForm.get('productType')?.touched">
+              <small appTranslate="please_select_product_type"></small>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="quantity" appTranslate="quantity"></label>
+            <input type="number" id="quantity" formControlName="quantity" class="form-control" min="1">
+            <div class="error-message" *ngIf="salesForm.get('quantity')?.invalid && salesForm.get('quantity')?.touched">
+              <small appTranslate="please_enter_valid_quantity"></small>
+            </div>
+          </div>
+        
+          <div class="form-group">
+            <label for="unitPrice" appTranslate="unit_price"></label>
+            <input type="text" id="unitPrice" formControlName="unitPrice" class="form-control" readonly>
+          </div>
+          
+          <div class="form-group">
+            <label for="totalPrice" appTranslate="total_amount"></label>
+            <input type="text" id="totalPrice" formControlName="totalPrice" class="form-control" readonly>
+          </div>
+        
+          <div class="form-group">
+            <label for="paymentMethod" appTranslate="payment_method"></label>
+            <select id="paymentMethod" formControlName="paymentMethod" class="form-control">
+              <option *ngFor="let method of paymentMethods" [value]="method">{{ method }}</option>
+            </select>
+            <div class="error-message" *ngIf="salesForm.get('paymentMethod')?.invalid && salesForm.get('paymentMethod')?.touched">
+              <small appTranslate="please_select_payment_method"></small>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="saleDate" appTranslate="sale_date"></label>
+            <div class="date-input-container">
+              <input type="date" id="saleDate" formControlName="saleDate" class="form-control">
+            </div>
+            <div class="error-message" *ngIf="salesForm.get('saleDate')?.invalid && salesForm.get('saleDate')?.touched">
+              <small appTranslate="please_select_date"></small>
+            </div>
+          </div>
+        
+          <div class="form-group">
+            <label for="period" appTranslate="shift"></label>
+            <select id="period" formControlName="period" class="form-control">
+              <option value="">{{ 'select_shift' | translate }}</option>
+              <option *ngFor="let period of periods" [value]="period">{{ period }}</option>
+            </select>
+            <div class="error-message" *ngIf="salesForm.get('period')?.invalid && salesForm.get('period')?.touched">
+              <small appTranslate="please_select_shift"></small>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="cashier" appTranslate="cashier"></label>
+            <select id="cashier" formControlName="cashier" class="form-control">
+              <option value="">{{ 'select_cashier' | translate }}</option>
+              <option *ngFor="let cashier of cashiers" [value]="cashier">{{ cashier }}</option>
+            </select>
+            <div class="error-message" *ngIf="salesForm.get('cashier')?.invalid && salesForm.get('cashier')?.touched">
+              <small appTranslate="please_select_cashier"></small>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" (click)="resetForm()" appTranslate="clear"></button>
+          <button type="submit" class="btn-save" [disabled]="salesForm.invalid" appTranslate="add_sale"></button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Yan kart - İstatistikler -->
+    <div class="stats-card">
+      <h3 appTranslate="sales_statistics"></h3>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="fas fa-shopping-cart"></i>
+          </div>
+          <div class="stat-info">
+            <h4 appTranslate="total_sales"></h4>
+            <p>{{ totalSales || '0' }}</p>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="fas fa-money-bill-wave"></i>
+          </div>
+          <div class="stat-info">
+            <h4 appTranslate="total_revenue"></h4>
+            <p>{{ formatCurrency(totalRevenue) || '0 TL' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -6,19 +6,18 @@ import { RouterModule } from '@angular/router';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './core/components/login/login.component';
+import { ProductSalesComponent } from './core/components/product-sales/product-sales.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    LoginComponent
-  ],
+  declarations: [],
   imports: [
+    AppComponent,
+    LoginComponent,
+    ProductSalesComponent,
     BrowserModule,
     ReactiveFormsModule,
-    HttpClientModule,
     RouterModule.forRoot([])
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: []
 })
-export class AppModule { } 
+export class AppModule { }

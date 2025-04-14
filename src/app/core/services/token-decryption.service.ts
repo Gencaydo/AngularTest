@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import * as CryptoJS from 'crypto-js';
+import AES from 'crypto-js/aes';
+import Utf8 from 'crypto-js/enc-utf8';
+import Base64 from 'crypto-js/enc-base64';
+import { mode, pad } from 'crypto-js';
 
-declare module 'crypto-js' {
-  interface WordArray {
-    toString(encoder?: any): string;
-  }
+interface WordArray {
+  toString(encoder?: any): string;
 }
 
 @Injectable({
@@ -20,13 +21,13 @@ export class TokenService {
         throw new Error('Invalid token format');
       }
 
-      const bytes = CryptoJS.AES.decrypt(encryptedData, CryptoJS.enc.Utf8.parse(TokenService.encryptionKey), {
-        iv: CryptoJS.enc.Base64.parse(iv),
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7
+      const bytes = AES.decrypt(encryptedData, Utf8.parse(TokenService.encryptionKey), {
+        iv: Base64.parse(iv),
+        mode: mode.CBC,
+        padding: pad.Pkcs7
       });
 
-      return bytes.toString(CryptoJS.enc.Utf8);
+      return bytes.toString(Utf8);
     } catch (error) {
       console.error('Failed to decrypt token:', error);
       return '';

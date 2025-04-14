@@ -1,0 +1,565 @@
+.product-sales-container {
+  min-height: calc(100vh - 60px);
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+
+  .product-header {
+    margin-bottom: 20px;
+    padding: 0 15px;
+    width: 100%;
+    box-sizing: border-box;
+
+    h2 {
+      font-size: 28px;
+      color: #2c3e50;
+      margin: 0;
+      font-weight: 700;
+      background: linear-gradient(45deg, #2c3e50, #556ee6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p {
+      color: #6c757d;
+      margin: 8px 0 0;
+      font-size: 16px;
+    }
+  }
+
+  .product-content {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 15px;
+    padding: 0 10px;
+    width: 100%;
+    box-sizing: border-box;
+
+    @media (max-width: 992px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .product-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    height: fit-content;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(85, 110, 230, 0.1);
+
+    h3 {
+      font-size: 20px;
+      color: #2c3e50;
+      margin: 0 0 20px 0;
+      font-weight: 700;
+      border-bottom: 1px solid #e9ecef;
+      padding-bottom: 10px;
+    }
+
+    .sales-form {
+      width: 100%;
+      box-sizing: border-box;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+
+        label {
+          display: block;
+          margin-bottom: 8px;
+          color: #2c3e50;
+          font-weight: 600;
+          font-size: 14px;
+        }
+
+        .form-control {
+          width: 100%;
+          height: auto;
+          min-height: 40px;
+          padding: 8px 12px;
+          border: 1px solid #e9ecef;
+          border-radius: 6px;
+          font-size: 14px;
+          background-color: #f8f9fa;
+          line-height: 1.4;
+          color: #2c3e50;
+          transition: all 0.2s ease;
+          box-sizing: border-box;
+
+          &:focus {
+            border-color: #556ee6;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(85, 110, 230, 0.1);
+            background-color: #fff;
+          }
+
+          &::placeholder {
+            color: #adb5bd;
+            font-size: 14px;
+          }
+
+          &:disabled, &[readonly] {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+            opacity: 0.7;
+          }
+        }
+
+        .date-input-container {
+          position: relative;
+
+          &::after {
+            content: '\f073';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            color: #556ee6;
+            pointer-events: none;
+          }
+
+          input[type="date"] {
+            padding-right: 35px;
+          }
+        }
+
+        .error-message {
+          color: #f46a6a;
+          font-size: 12px;
+          margin-top: 6px;
+          display: block;
+          font-weight: 500;
+          
+          small {
+            display: block;
+            line-height: 1.4;
+            
+            &:not(:last-child) {
+              margin-bottom: 4px;
+            }
+          }
+        }
+      }
+
+      .form-actions {
+        margin-top: auto;
+        padding-top: 15px;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+
+        button {
+          padding: 8px 20px;
+          border-radius: 6px;
+          font-weight: 600;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+
+          &.btn-cancel {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            color: #6c757d;
+
+            &:hover {
+              background: #e9ecef;
+            }
+          }
+
+          &.btn-save {
+            background: #556ee6;
+            border: none;
+            color: white;
+            box-shadow: 0 2px 4px rgba(85, 110, 230, 0.2);
+
+            &:hover:not(:disabled) {
+              background: #485ec4;
+              transform: translateY(-1px);
+            }
+
+            &:disabled {
+              background: #e9ecef;
+              cursor: not-allowed;
+              box-shadow: none;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .stats-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid rgba(85, 110, 230, 0.1);
+    height: fit-content;
+
+    h3 {
+      font-size: 18px;
+      color: #2c3e50;
+      margin: 0 0 20px 0;
+      font-weight: 700;
+      border-bottom: 1px solid #e9ecef;
+      padding-bottom: 10px;
+    }
+
+    .stats-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .stat-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 8px;
+        background: linear-gradient(45deg, #556ee6, #34c38f);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        color: white;
+        font-size: 20px;
+      }
+
+      .stat-info {
+        h4 {
+          font-size: 14px;
+          color: #6c757d;
+          margin: 0 0 5px 0;
+          font-weight: 600;
+        }
+
+        p {
+          font-size: 18px;
+          color: #2c3e50;
+          margin: 0;
+          font-weight: 700;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .form-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+}
+
+h3 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #333;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+// Filtre paneli
+.filter-panel {
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 15px;
+
+    .form-group {
+      flex: 1;
+      min-width: 180px;
+    }
+  }
+
+  .filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+}
+
+// Satış formu
+.sales-form {
+  background-color: #fff;
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 15px;
+
+    .form-group {
+      flex: 1;
+      min-width: 180px;
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+}
+
+// Form kontrolleri
+.form-group {
+  margin-bottom: 15px;
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+
+    &:focus {
+      border-color: #80bdff;
+      outline: 0;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    &:disabled, &[readonly] {
+      background-color: #e9ecef;
+      opacity: 1;
+    }
+  }
+
+  .error-message {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
+  }
+}
+
+// Butonlar
+.btn {
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid transparent;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  border-radius: 4px;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+
+  &.btn-primary {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+    
+    &:hover {
+      background-color: #0069d9;
+      border-color: #0062cc;
+    }
+  }
+
+  &.btn-secondary {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+    
+    &:hover {
+      background-color: #5a6268;
+      border-color: #545b62;
+    }
+  }
+
+  &.btn-success {
+    color: #fff;
+    background-color: #28a745;
+    border-color: #28a745;
+    
+    &:hover {
+      background-color: #218838;
+      border-color: #1e7e34;
+    }
+  }
+
+  &.btn-danger {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545;
+    
+    &:hover {
+      background-color: #c82333;
+      border-color: #bd2130;
+    }
+  }
+
+  &.btn-info {
+    color: #fff;
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    
+    &:hover {
+      background-color: #138496;
+      border-color: #117a8b;
+    }
+  }
+
+  &.btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 3px;
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    pointer-events: none;
+  }
+}
+
+// Satış listesi
+.sales-list {
+  background-color: #fff;
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+// Tablo stilleri
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  
+  th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+  }
+  
+  tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+  }
+
+  .no-data {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+    font-style: italic;
+  }
+}
+
+// Dönemlik rapor
+.period-report {
+  background-color: #fff;
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+
+  .report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    
+    h3 {
+      margin-bottom: 0;
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+    
+    .btn-close {
+      background-color: transparent;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      color: #6c757d;
+      
+      &:hover {
+        color: #dc3545;
+      }
+    }
+  }
+}
+
+// Mobil için duyarlı tasarım
+@media (max-width: 768px) {
+  .filter-row, .form-row {
+    flex-direction: column;
+    
+    .form-group {
+      width: 100%;
+    }
+  }
+
+  .filter-actions, .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+    
+    .btn {
+      margin-bottom: 5px;
+    }
+  }
+
+  .table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+} 

@@ -112,6 +112,14 @@
   }
 
   .navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    
+    .language-selector-container {
+      margin-right: 5px;
+    }
+
     .user-info {
       display: flex;
       align-items: center;

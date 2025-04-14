@@ -1,0 +1,72 @@
+<div class="report-filter-container">
+  <div class="filter-header">
+    <h2><fa-icon [icon]="faFilter"></fa-icon> {{ 'periodic_report_filter' | translate }}</h2>
+    <p appTranslate="periodic_report_description"></p>
+  </div>
+
+  <div class="filter-card">
+    <form [formGroup]="filterForm" (ngSubmit)="onSubmit()">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="reportType" appTranslate="report_type"></label>
+          <select id="reportType" formControlName="reportType" class="form-control">
+            <option value="">{{ 'report_type' | translate }}</option>
+            <option *ngFor="let type of reportTypes" [value]="type.id">{{ type.name }}</option>
+          </select>
+          <div *ngIf="filterForm.get('reportType')?.invalid && filterForm.get('reportType')?.touched" class="error-message">
+            <span appTranslate="required"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="startDate" appTranslate="start_date"></label>
+          <div class="date-input-container">
+            <fa-icon [icon]="faCalendar" class="date-icon"></fa-icon>
+            <input type="date" id="startDate" formControlName="startDate" class="form-control">
+          </div>
+          <div *ngIf="filterForm.get('startDate')?.invalid && filterForm.get('startDate')?.touched" class="error-message">
+            <span appTranslate="required"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="endDate" appTranslate="end_date"></label>
+          <div class="date-input-container">
+            <fa-icon [icon]="faCalendar" class="date-icon"></fa-icon>
+            <input type="date" id="endDate" formControlName="endDate" class="form-control">
+          </div>
+          <div *ngIf="filterForm.get('endDate')?.invalid && filterForm.get('endDate')?.touched" class="error-message">
+            <span appTranslate="required"></span>
+          </div>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <div class="checkbox-wrapper">
+            <input type="checkbox" id="includeAllBranches" formControlName="includeAllBranches" class="form-checkbox">
+            <label for="includeAllBranches" appTranslate="include_all_branches"></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="reset" class="btn-cancel" appTranslate="clear"></button>
+        <button type="submit" class="btn-generate" [disabled]="filterForm.invalid">
+          <fa-icon [icon]="faSearch"></fa-icon> {{ 'view_report' | translate }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Report Results Section (Placeholder) -->
+  <div class="report-results" *ngIf="filterForm.valid && filterForm.touched">
+    <h3 appTranslate="report_results"></h3>
+    <p appTranslate="periodic_report_description"></p>
+    <div class="placeholder-chart">
+      <div class="chart-bar" style="height: 60%"></div>
+      <div class="chart-bar" style="height: 80%"></div>
+      <div class="chart-bar" style="height: 40%"></div>
+      <div class="chart-bar" style="height: 70%"></div>
+      <div class="chart-bar" style="height: 50%"></div>
+    </div>
+  </div>
+</div>

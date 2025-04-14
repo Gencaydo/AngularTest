@@ -2,7 +2,7 @@
   <!-- Sidebar -->
   <aside class="sidebar" [class.collapsed]="isSidebarCollapsed">
     <div class="sidebar-header">
-      <h2 *ngIf="!isSidebarCollapsed">Dashboard</h2>
+      <h2 *ngIf="!isSidebarCollapsed" appTranslate="home"></h2>
       <button class="toggle-btn" (click)="toggleSidebar()">
         <fa-icon [icon]="faBars"></fa-icon>
       </button>
@@ -10,15 +10,23 @@
     <nav class="sidebar-nav">
       <a routerLink="/index" routerLinkActive="active">
         <fa-icon [icon]="faHome"></fa-icon>
-        <span *ngIf="!isSidebarCollapsed">Home</span>
+        <span *ngIf="!isSidebarCollapsed" appTranslate="home"></span>
       </a>
       <a routerLink="/profile" routerLinkActive="active">
         <fa-icon [icon]="faUser"></fa-icon>
-        <span *ngIf="!isSidebarCollapsed">Profile</span>
+        <span *ngIf="!isSidebarCollapsed" appTranslate="profile"></span>
+      </a>
+      <a routerLink="/product-sales" routerLinkActive="active">
+        <fa-icon [icon]="faDollarSign"></fa-icon>
+        <span *ngIf="!isSidebarCollapsed" appTranslate="product_sales"></span>
+      </a>
+      <a routerLink="/periodic-report" routerLinkActive="active">
+        <fa-icon [icon]="faChartBar"></fa-icon>
+        <span *ngIf="!isSidebarCollapsed" appTranslate="periodic_report"></span>
       </a>
       <a (click)="onLogout()">
         <fa-icon [icon]="faSignOutAlt"></fa-icon>
-        <span *ngIf="!isSidebarCollapsed">Logout</span>
+        <span *ngIf="!isSidebarCollapsed" appTranslate="logout"></span>
       </a>
     </nav>
   </aside>
@@ -33,6 +41,7 @@
         </button>
       </div>
       <div class="navbar-right">
+        <app-language-selector class="language-selector-container"></app-language-selector>
         <div class="user-info">
           <span class="user-name">{{userName}}</span>
         </div>
