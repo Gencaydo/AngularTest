@@ -4,7 +4,6 @@ import { Observable, from, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { AuthStateService } from './auth-state.service';
-import { TokenService } from './token-decryption.service'; 
 
 @Injectable({
   providedIn: 'root'
@@ -30,11 +29,8 @@ export class ApiService {
     this.axiosInstance.interceptors.request.use(config => {
       const token = this.authState.getToken();
       if (token) {
-        const decryptedtoken = TokenService.decryptToken(token);
-        if (decryptedtoken) {
-          config.headers = config.headers || {};
-          config.headers['Authorization'] = `Bearer ${decryptedtoken}`;
-        }
+        config.headers = config.headers || {};
+        config.headers['Authorization'] = `Bearer ${token}`;
       }
       
       return config;

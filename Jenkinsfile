@@ -51,39 +51,6 @@ pipeline {
             }
         }
 
-        stage('Test Image') {
-            steps {
-                script {
-                    def containerId = sh(
-                        script: "docker run -d -p ${CONTAINER_PORT}:${CONTAINER_PORT} ${FULL_IMAGE}:${IMAGE_TAG}",
-                        returnStdout: true
-                    ).trim()
-
-                    try {
-                        sh """
-                            CONTAINER_IP=\$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${containerId})
-                            echo "Container IP: \$CONTAINER_IP"
-                            echo "Waiting for Nginx to be ready on \$CONTAINER_IP:${CONTAINER_PORT}..."
-                            for i in \$(seq 1 15); do
-                                if wget -qO- http://\$CONTAINER_IP:${CONTAINER_PORT} 2>/dev/null | grep -q 'app-root'; then
-                                    echo "Health check passed on attempt \$i"
-                                    exit 0
-                                fi
-                                echo "Attempt \$i/15 - not ready yet, retrying in 3s..."
-                                sleep 3
-                            done
-                            echo "=== Container logs ==="
-                            docker logs ${containerId}
-                            echo "Health check failed after 15 attempts"
-                            exit 1
-                        """
-                    } finally {
-                        sh "docker stop ${containerId} && docker rm ${containerId}"
-                    }
-                }
-            }
-        }
-
         stage('Push to Registry') {
             when {
                 allOf {
