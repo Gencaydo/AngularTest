@@ -1,0 +1,67 @@
+<div class="page-container">
+  <div class="page-header">
+    <h2>AspNet User Logins</h2>
+    <button class="btn-primary" (click)="openCreate()">+ Add Login</button>
+  </div>
+  <div class="error-msg" *ngIf="errorMsg">{{ errorMsg }}</div>
+  <div class="search-bar">
+    <input type="text" placeholder="Search by userId or provider..." [(ngModel)]="searchTerm" (input)="applySearch()" />
+  </div>
+  <div class="table-card">
+    <div class="loading" *ngIf="loading">Loading...</div>
+    <div class="table-wrapper" *ngIf="!loading">
+      <table>
+        <thead>
+          <tr>
+            <th>Login Provider</th>
+            <th>Provider Key</th>
+            <th>Display Name</th>
+            <th>User ID</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of filtered">
+            <td>{{ row.loginProvider }}</td>
+            <td [title]="row.providerKey">{{ row.providerKey }}</td>
+            <td>{{ row.providerDisplayName }}</td>
+            <td [title]="row.userId">{{ row.userId }}</td>
+            <td class="actions">
+              <button class="btn-edit" (click)="openEdit(row)">Edit</button>
+              <button class="btn-delete" (click)="delete(row.loginProvider, row.providerKey)">Delete</button>
+            </td>
+          </tr>
+          <tr *ngIf="filtered.length === 0">
+            <td colspan="5"><div class="empty-state"><p>No records found.</p></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3>{{ isEdit ? 'Edit Login' : 'Add Login' }}</h3>
+    <div class="form-group">
+      <label>Login Provider</label>
+      <input type="text" [(ngModel)]="form.loginProvider" [disabled]="isEdit" />
+    </div>
+    <div class="form-group">
+      <label>Provider Key</label>
+      <input type="text" [(ngModel)]="form.providerKey" [disabled]="isEdit" />
+    </div>
+    <div class="form-group">
+      <label>Display Name</label>
+      <input type="text" [(ngModel)]="form.providerDisplayName" />
+    </div>
+    <div class="form-group">
+      <label>User ID</label>
+      <input type="text" [(ngModel)]="form.userId" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+      <button class="btn-save" (click)="save()">{{ isEdit ? 'Update' : 'Create' }}</button>
+    </div>
+  </div>
+</div>

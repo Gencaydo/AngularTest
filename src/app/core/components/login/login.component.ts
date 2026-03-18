@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { LoginService } from '../../services/login.service';
@@ -17,7 +17,7 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   isSubmitting = false;
   loading = false;
-  errorMessage = '';
+  errorMessages: string[] = [];
   hidePassword = true;
 
   constructor(
@@ -25,7 +25,8 @@ export class LoginComponent implements OnInit {
     private loginService: LoginService,
     private googleAuthService: GoogleAuthService,
     private router: Router,
-    private authState: AuthStateService
+    private authState: AuthStateService,
+    private ngZone: NgZone
   ) {
     // Redirect if already logged in
     if (this.authState.isAuthenticated()) {
@@ -59,7 +60,7 @@ export class LoginComponent implements OnInit {
     if (this.loginForm.valid) {
       this.isSubmitting = true;
       this.loading = true;
-      this.errorMessage = '';
+      this.errorMessages = [];
 
       const credentials = {
         email: this.loginForm.get('email')?.value,
@@ -68,27 +69,37 @@ export class LoginComponent implements OnInit {
 
       this.loginService.login(credentials).subscribe({
         next: (response) => {
-          if (response.statusCode === 200 && response.data) {
-            // Store user info if needed
-            localStorage.setItem('userEmail', credentials.email);
-            // Navigate to index
-            this.router.navigate(['/index'], { replaceUrl: true });
-          } else if (response.error?.errors) {
-            this.errorMessage = response.error.errors[0];
-          }
+          this.ngZone.run(() => {
+            if (response.statusCode === 200 && response.data) {
+              localStorage.setItem('userEmail', credentials.email);
+              this.router.navigate(['/index'], { replaceUrl: true });
+            } else if (response.error?.errors?.length) {
+              this.errorMessages = response.error.errors;
+            }
+          });
         },
         error: (error) => {
-          this.errorMessage = error;
-          this.loading = false;
-          this.isSubmitting = false;
+          this.ngZone.run(() => {
+            if (Array.isArray(error)) {
+              this.errorMessages = error;
+            } else if (typeof error === 'string') {
+              this.errorMessages = [error];
+            } else {
+              this.errorMessages = ['An unexpected error occurred. Please try again.'];
+            }
+            this.loading = false;
+            this.isSubmitting = false;
+          });
         },
         complete: () => {
-          this.loading = false;
-          this.isSubmitting = false;
+          this.ngZone.run(() => {
+            this.loading = false;
+            this.isSubmitting = false;
+          });
         }
       });
     } else {
-      this.errorMessage = 'Please fill in all required fields correctly';
+      this.errorMessages = ['Please fill in all required fields correctly'];
       Object.keys(this.loginForm.controls).forEach(key => {
         const control = this.loginForm.get(key);
         if (control?.invalid) {
@@ -98,7 +109,7 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  clearError() {
-    this.errorMessage = '';
+  clearErrors() {
+    this.errorMessages = [];
   }
 } 

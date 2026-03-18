@@ -6,9 +6,11 @@
     </div>
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
-      <div *ngIf="errorMessage" class="alert alert-danger" (click)="clearError()">
+      <div *ngIf="errorMessages.length" class="alert alert-danger" (click)="clearErrors()">
         <i class="fas fa-exclamation-circle"></i>
-        {{ errorMessage }}
+        <ul class="error-list">
+          <li *ngFor="let msg of errorMessages">{{ msg }}</li>
+        </ul>
         <button type="button" class="close-alert" aria-label="Close">
           <i class="fas fa-times"></i>
         </button>

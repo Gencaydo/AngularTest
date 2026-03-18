@@ -1,0 +1,90 @@
+<div class="page-container">
+  <div class="page-header">
+    <h2>AspNet Users</h2>
+    <button class="btn-primary" (click)="openCreate()">+ Add User</button>
+  </div>
+  <div class="error-msg" *ngIf="errorMsg">{{ errorMsg }}</div>
+  <div class="search-bar">
+    <input type="text" placeholder="Search by username or email..." [(ngModel)]="searchTerm" (input)="applySearch()" />
+  </div>
+  <div class="table-card">
+    <div class="loading" *ngIf="loading">Loading...</div>
+    <div class="table-wrapper" *ngIf="!loading">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Email Confirmed</th>
+            <th>2FA</th>
+            <th>Lockout</th>
+            <th>Failed Logins</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of filtered">
+            <td [title]="row.id">{{ row.id }}</td>
+            <td>{{ row.userName }}</td>
+            <td>{{ row.email }}</td>
+            <td><span class="badge" [ngClass]="row.emailConfirmed ? 'badge-success' : 'badge-danger'">{{ row.emailConfirmed ? 'Yes' : 'No' }}</span></td>
+            <td><span class="badge" [ngClass]="row.twoFactorEnabled ? 'badge-info' : 'badge-danger'">{{ row.twoFactorEnabled ? 'On' : 'Off' }}</span></td>
+            <td><span class="badge" [ngClass]="row.lockoutEnabled ? 'badge-info' : 'badge-success'">{{ row.lockoutEnabled ? 'On' : 'Off' }}</span></td>
+            <td>{{ row.accessFailedCount }}</td>
+            <td class="actions">
+              <button class="btn-edit" (click)="openEdit(row)">Edit</button>
+              <button class="btn-delete" (click)="delete(row.id)">Delete</button>
+            </td>
+          </tr>
+          <tr *ngIf="filtered.length === 0">
+            <td colspan="8"><div class="empty-state"><p>No records found.</p></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3>{{ isEdit ? 'Edit User' : 'Add User' }}</h3>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" [(ngModel)]="form.userName" />
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" [(ngModel)]="form.email" />
+    </div>
+    <div class="form-group">
+      <label>Phone Number</label>
+      <input type="text" [(ngModel)]="form.phoneNumber" />
+    </div>
+    <div class="form-group">
+      <label>Email Confirmed</label>
+      <select [(ngModel)]="form.emailConfirmed">
+        <option [ngValue]="true">Yes</option>
+        <option [ngValue]="false">No</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Two Factor Enabled</label>
+      <select [(ngModel)]="form.twoFactorEnabled">
+        <option [ngValue]="true">On</option>
+        <option [ngValue]="false">Off</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Lockout Enabled</label>
+      <select [(ngModel)]="form.lockoutEnabled">
+        <option [ngValue]="true">On</option>
+        <option [ngValue]="false">Off</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+      <button class="btn-save" (click)="save()">{{ isEdit ? 'Update' : 'Create' }}</button>
+    </div>
+  </div>
+</div>

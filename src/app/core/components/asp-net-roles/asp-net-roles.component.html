@@ -1,0 +1,68 @@
+<div class="page-container">
+  <div class="page-header">
+    <h2>AspNet Roles</h2>
+    <button class="btn-primary" (click)="openCreate()">+ Add Role</button>
+  </div>
+
+  <div class="error-msg" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+  <div class="search-bar">
+    <input type="text" placeholder="Search by name..." [(ngModel)]="searchTerm" (input)="applySearch()" />
+  </div>
+
+  <div class="table-card">
+    <div class="loading" *ngIf="loading">Loading...</div>
+    <div class="table-wrapper" *ngIf="!loading">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Normalized Name</th>
+            <th>Concurrency Stamp</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of filtered">
+            <td [title]="row.id">{{ row.id }}</td>
+            <td>{{ row.name }}</td>
+            <td>{{ row.normalizedName }}</td>
+            <td [title]="row.concurrencyStamp">{{ row.concurrencyStamp }}</td>
+            <td class="actions">
+              <button class="btn-edit" (click)="openEdit(row)">Edit</button>
+              <button class="btn-delete" (click)="delete(row.id)">Delete</button>
+            </td>
+          </tr>
+          <tr *ngIf="filtered.length === 0">
+            <td colspan="5">
+              <div class="empty-state"><p>No records found.</p></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3>{{ isEdit ? 'Edit Role' : 'Add Role' }}</h3>
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" [(ngModel)]="form.name" />
+    </div>
+    <div class="form-group">
+      <label>Normalized Name</label>
+      <input type="text" [(ngModel)]="form.normalizedName" />
+    </div>
+    <div class="form-group" *ngIf="isEdit">
+      <label>Concurrency Stamp</label>
+      <input type="text" [(ngModel)]="form.concurrencyStamp" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+      <button class="btn-save" (click)="save()">{{ isEdit ? 'Update' : 'Create' }}</button>
+    </div>
+  </div>
+</div>

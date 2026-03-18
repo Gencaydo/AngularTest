@@ -118,17 +118,16 @@ export class ApiService {
       });
 
       const errorResponse = error.response?.data;
-      let errorMessage = 'An unexpected error occurred';
-      
+
       if (errorResponse?.error?.errors && errorResponse.error.errors.length > 0) {
-        errorMessage = errorResponse.error.errors[0];
+        return throwError(() => errorResponse.error.errors as string[]);
       } else if (error.response?.status === 404) {
-        errorMessage = `API endpoint not found: ${error.config?.url}`;
+        return throwError(() => [`API endpoint not found: ${error.config?.url}`]);
       }
 
-      return throwError(() => errorMessage);
+      return throwError(() => ['An unexpected error occurred']);
     }
     
-    return throwError(() => error.message || 'An unexpected error occurred');
+    return throwError(() => [error.message || 'An unexpected error occurred']);
   }
 } 

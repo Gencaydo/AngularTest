@@ -175,6 +175,17 @@
   opacity: 1;
 }
 
+.error-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+}
+
+.error-list li + li {
+  margin-top: 4px;
+}
+
 .spinner {
   width: 20px;
   height: 20px;

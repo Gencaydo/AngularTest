@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faHome, faUser, faSignOutAlt, faBars, faDollarSign, faChartBar } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faUser, faSignOutAlt, faBars, faDollarSign, faChartBar, faShieldAlt, faKey, faUsers, faUserTag, faUserLock, faUserShield, faTicketAlt, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 import { LoginService } from '../../services/login.service';
 import { LanguageSelectorComponent } from '../language-selector/language-selector.component';
 import { TranslateDirective } from '../../directives/translate.directive';
@@ -29,6 +29,14 @@ export class LayoutComponent implements OnInit {
   faBars = faBars;
   faDollarSign = faDollarSign;
   faChartBar = faChartBar;
+  faShieldAlt = faShieldAlt;
+  faKey = faKey;
+  faUsers = faUsers;
+  faUserTag = faUserTag;
+  faUserLock = faUserLock;
+  faUserShield = faUserShield;
+  faTicketAlt = faTicketAlt;
+  faSyncAlt = faSyncAlt;
 
   isSidebarCollapsed = false;
   userName: string = '';

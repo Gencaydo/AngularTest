@@ -22,8 +22,44 @@
       </a>
       <a routerLink="/periodic-report" routerLinkActive="active">
         <fa-icon [icon]="faChartBar"></fa-icon>
-        <span *ngIf="!isSidebarCollapsed" appTranslate="periodic_report"></span>
+        <span *ngIf="!isSidebarCollapsed">Periodic Report</span>
       </a>
+
+      <div class="sidebar-section-label" *ngIf="!isSidebarCollapsed">Identity</div>
+
+      <a routerLink="/asp-net-users" routerLinkActive="active">
+        <fa-icon [icon]="faUsers"></fa-icon>
+        <span *ngIf="!isSidebarCollapsed">Users</span>
+      </a>
+      <a routerLink="/asp-net-roles" routerLinkActive="active">
+        <fa-icon [icon]="faShieldAlt"></fa-icon>
+        <span *ngIf="!isSidebarCollapsed">Roles</span>
+      </a>
+      <a routerLink="/asp-net-role-claims" routerLinkActive="active">
+        <fa-icon [icon]="faKey"></fa-icon>
+        <span *ngIf="!isSidebarCollapsed">Role Claims</span>
+      </a>
+      <a routerLink="/asp-net-user-claims" routerLinkActive="active">
+        <fa-icon [icon]="faUserTag"></fa-icon>
+        <span *ngIf="!isSidebarCollapsed">User Claims</span>
+      </a>
+      <a routerLink="/asp-net-user-logins" routerLinkActive="active">
+        <fa-icon [icon]="faUserLock"></fa-icon>
+        <span *ngIf="!isSidebarCollapsed">User Logins</span>
+      </a>
+      <a routerLink="/asp-net-user-roles" routerLinkActive="active">
+        <fa-icon [icon]="faUserShield"></fa-icon>
+        <span *ngIf="!isSidebarCollapsed">User Roles</span>
+      </a>
+      <a routerLink="/asp-net-user-tokens" routerLinkActive="active">
+        <fa-icon [icon]="faTicketAlt"></fa-icon>
+        <span *ngIf="!isSidebarCollapsed">User Tokens</span>
+      </a>
+      <a routerLink="/user-refresh-tokens" routerLinkActive="active">
+        <fa-icon [icon]="faSyncAlt"></fa-icon>
+        <span *ngIf="!isSidebarCollapsed">Refresh Tokens</span>
+      </a>
+
       <a (click)="onLogout()">
         <fa-icon [icon]="faSignOutAlt"></fa-icon>
         <span *ngIf="!isSidebarCollapsed" appTranslate="logout"></span>

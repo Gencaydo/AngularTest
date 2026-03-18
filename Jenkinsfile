@@ -76,19 +76,34 @@ pipeline {
         }
 
         stage('Deploy') {
-            when {
-                anyOf {
-                    branch 'main'
-                    branch 'master'
-                }
-            }
             steps {
                 script {
-                    echo "Deploying ${FULL_IMAGE}:${IMAGE_TAG}"
+                    def latestTag = sh(
+                        script: "docker images ${FULL_IMAGE} --format '{{.Tag}}' | grep -v latest | sort -rn | head -1",
+                        returnStdout: true
+                    ).trim()
+                    echo "Latest image tag found: ${latestTag}"
+                    echo "Deploying ${FULL_IMAGE}:${latestTag}"
                     sh """
-                        docker-compose down --remove-orphans || true
-                        IMAGE_TAG=${IMAGE_TAG} docker-compose up -d --force-recreate
+                        # Stop and remove the named container if it exists
+                        docker stop angulartest || true
+                        docker rm angulartest || true
+
+                        # Kill any other container still holding port 4200
+                        EXISTING=\$(docker ps -q --filter "publish=${CONTAINER_PORT}")
+                        if [ -n "\$EXISTING" ]; then
+                            echo "Stopping container holding port ${CONTAINER_PORT}: \$EXISTING"
+                            docker stop \$EXISTING || true
+                            docker rm \$EXISTING || true
+                        fi
+
+                        docker run -d \
+                            --name angulartest \
+                            --restart unless-stopped \
+                            -p ${CONTAINER_PORT}:${CONTAINER_PORT} \
+                            ${FULL_IMAGE}:${latestTag}
                     """
+                    echo "Container started successfully with image ${FULL_IMAGE}:${latestTag}"
                 }
             }
         }

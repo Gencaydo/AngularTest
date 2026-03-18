@@ -1,0 +1,50 @@
+<div class="page-container">
+  <div class="page-header">
+    <h2>User Refresh Tokens</h2>
+  </div>
+  <div class="error-msg" *ngIf="errorMsg">{{ errorMsg }}</div>
+  <div class="search-bar">
+    <input type="text" placeholder="Search by userId or token..." [(ngModel)]="searchTerm" (input)="applySearch()" />
+  </div>
+  <div class="table-card">
+    <div class="loading" *ngIf="loading">Loading...</div>
+    <div class="table-wrapper" *ngIf="!loading">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User ID</th>
+            <th>Token</th>
+            <th>Expires</th>
+            <th>Created</th>
+            <th>Revoked</th>
+            <th>Active</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of filtered">
+            <td>{{ row.id }}</td>
+            <td [title]="row.userId">{{ row.userId }}</td>
+            <td [title]="row.token">{{ row.token | slice:0:20 }}...</td>
+            <td>{{ row.expires | date:'short' }}</td>
+            <td>{{ row.created | date:'short' }}</td>
+            <td>{{ row.revoked ? (row.revoked | date:'short') : '-' }}</td>
+            <td>
+              <span class="badge" [ngClass]="row.isActive ? 'badge-success' : 'badge-danger'">
+                {{ row.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td class="actions">
+              <button class="btn-edit" (click)="revoke(row.id)" *ngIf="row.isActive">Revoke</button>
+              <button class="btn-delete" (click)="delete(row.id)">Delete</button>
+            </td>
+          </tr>
+          <tr *ngIf="filtered.length === 0">
+            <td colspan="8"><div class="empty-state"><p>No records found.</p></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
