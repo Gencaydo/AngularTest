@@ -2,5 +2,7 @@ export interface RegisterModel {
     userName: string;
     email: string;
     password: string;
-    passwordConfirm: string;
+    firstName: string;
+    lastName: string;
+    mobilePhoneNumber: string;
 } 

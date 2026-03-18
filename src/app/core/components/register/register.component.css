@@ -38,6 +38,16 @@
   gap: 24px;
 }
 
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.form-row .form-field {
+  flex: 1;
+  min-width: 0;
+}
+
 .form-field {
   display: flex;
   flex-direction: column;
@@ -205,5 +215,10 @@
 @media (max-width: 480px) {
   .register-box {
     padding: 24px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
   }
 } 

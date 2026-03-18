@@ -1,4 +1,4 @@
-import { Component, NgZone, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { LoginService } from '../../services/login.service';
@@ -25,8 +25,7 @@ export class LoginComponent implements OnInit {
     private loginService: LoginService,
     private googleAuthService: GoogleAuthService,
     private router: Router,
-    private authState: AuthStateService,
-    private ngZone: NgZone
+    private authState: AuthStateService
   ) {
     // Redirect if already logged in
     if (this.authState.isAuthenticated()) {
@@ -69,33 +68,21 @@ export class LoginComponent implements OnInit {
 
       this.loginService.login(credentials).subscribe({
         next: (response) => {
-          this.ngZone.run(() => {
-            if (response.statusCode === 200 && response.data) {
-              localStorage.setItem('userEmail', credentials.email);
-              this.router.navigate(['/index'], { replaceUrl: true });
-            } else if (response.error?.errors?.length) {
-              this.errorMessages = response.error.errors;
-            }
-          });
+          if (response.statusCode === 200 && response.data) {
+            localStorage.setItem('userEmail', credentials.email);
+            this.router.navigate(['/index'], { replaceUrl: true });
+          } else if (response.error?.errors?.length) {
+            this.errorMessages = response.error.errors;
+          }
         },
         error: (error) => {
-          this.ngZone.run(() => {
-            if (Array.isArray(error)) {
-              this.errorMessages = error;
-            } else if (typeof error === 'string') {
-              this.errorMessages = [error];
-            } else {
-              this.errorMessages = ['An unexpected error occurred. Please try again.'];
-            }
-            this.loading = false;
-            this.isSubmitting = false;
-          });
+          this.errorMessages = Array.isArray(error) ? error : ['An unexpected error occurred. Please try again.'];
+          this.loading = false;
+          this.isSubmitting = false;
         },
         complete: () => {
-          this.ngZone.run(() => {
-            this.loading = false;
-            this.isSubmitting = false;
-          });
+          this.loading = false;
+          this.isSubmitting = false;
         }
       });
     } else {

@@ -1,4 +1,4 @@
-import { Component, NgZone } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { RegisterService } from '../../services/register.service';
@@ -22,14 +22,16 @@ export class RegisterComponent {
   constructor(
     private formBuilder: FormBuilder,
     private registerService: RegisterService,
-    private router: Router,
-    private ngZone: NgZone
+    private router: Router
   ) {
     this.registerForm = this.formBuilder.group({
       userName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      passwordConfirm: ['', [Validators.required]]
+      passwordConfirm: ['', [Validators.required]],
+      firstName: ['', [Validators.required]],
+      lastName: ['', [Validators.required]],
+      mobilePhoneNumber: ['', [Validators.required, Validators.pattern(/^\+?[0-9\s\-()]{7,20}$/)]]
     }, {
       validator: this.passwordMatchValidator
     });
@@ -47,38 +49,27 @@ export class RegisterComponent {
       this.loading = true;
       this.errorMessages = [];
 
-      this.registerService.register(this.registerForm.value).subscribe({
+      const { passwordConfirm, ...registerData } = this.registerForm.value;
+      this.registerService.register(registerData).subscribe({
         next: (response) => {
-          this.ngZone.run(() => {
-            if (response.statusCode === 200 && response.data) {
-              localStorage.setItem('registrationData', JSON.stringify({
-                message: 'Registration successful! Please verify your email.',
-                email: this.registerForm.get('email')?.value
-              }));
-              this.router.navigate(['/login'], { replaceUrl: true });
-            } else if (response.error?.errors?.length) {
-              this.errorMessages = response.error.errors;
-            }
-          });
+          if (response.statusCode === 200 && response.data) {
+            localStorage.setItem('registrationData', JSON.stringify({
+              message: 'Registration successful! Please verify your email.',
+              email: this.registerForm.get('email')?.value
+            }));
+            this.router.navigate(['/login'], { replaceUrl: true });
+          } else if (response.error?.errors?.length) {
+            this.errorMessages = response.error.errors;
+          }
         },
         error: (error) => {
-          this.ngZone.run(() => {
-            if (Array.isArray(error)) {
-              this.errorMessages = error;
-            } else if (typeof error === 'string') {
-              this.errorMessages = [error];
-            } else {
-              this.errorMessages = ['An unexpected error occurred. Please try again.'];
-            }
-            this.loading = false;
-            this.isSubmitting = false;
-          });
+          this.errorMessages = Array.isArray(error) ? error : ['An unexpected error occurred. Please try again.'];
+          this.loading = false;
+          this.isSubmitting = false;
         },
         complete: () => {
-          this.ngZone.run(() => {
-            this.loading = false;
-            this.isSubmitting = false;
-          });
+          this.loading = false;
+          this.isSubmitting = false;
         }
       });
     } else {
