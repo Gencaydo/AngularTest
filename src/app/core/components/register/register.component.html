@@ -6,12 +6,12 @@
     </div>
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
-      <div *ngIf="errorMessages.length" class="alert alert-danger" (click)="clearErrors()">
+      <div *ngIf="errorMessages.length" class="alert alert-danger">
         <i class="fas fa-exclamation-circle"></i>
         <ul class="error-list">
           <li *ngFor="let msg of errorMessages">{{ msg }}</li>
         </ul>
-        <button type="button" class="close-alert" aria-label="Close">
+        <button type="button" class="close-alert" aria-label="Close" (click)="clearErrors()">
           <i class="fas fa-times"></i>
         </button>
       </div>
@@ -111,7 +111,7 @@
             id="passwordConfirm"
             formControlName="passwordConfirm"
             placeholder="Confirm your password"
-            [class.is-invalid]="registerForm.get('passwordConfirm')?.invalid && registerForm.get('passwordConfirm')?.touched"
+            [class.is-invalid]="(registerForm.get('passwordConfirm')?.invalid || registerForm.hasError('mismatch')) && registerForm.get('passwordConfirm')?.touched"
           >
           <button type="button" class="toggle-password" (click)="hideConfirmPassword = !hideConfirmPassword">
             <i [class]="hideConfirmPassword ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
