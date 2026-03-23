@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
@@ -12,7 +12,8 @@ import { AspNetUserRolesService } from '../../services/asp-net-user-roles.servic
   templateUrl: './asp-net-user-roles.component.html',
   styleUrls: ['./asp-net-user-roles.component.scss']
 })
-export class AspNetUserRolesComponent implements OnInit {
+export class AspNetUserRolesComponent {
+  userId = '';
   userRoles: AspNetUserRole[] = [];
   filtered: AspNetUserRole[] = [];
   searchTerm = '';
@@ -20,44 +21,42 @@ export class AspNetUserRolesComponent implements OnInit {
   errorMsg = '';
 
   showModal = false;
-  form: Partial<AspNetUserRole> = {};
+  form: { roleId: string } = { roleId: '' };
 
   constructor(private service: AspNetUserRolesService, private cdr: ChangeDetectorRef) {}
 
-  ngOnInit(): void { this.load(); }
-
   load(): void {
+    if (!this.userId.trim()) return;
     this.loading = true;
     this.errorMsg = '';
-    this.service.getAll()
+    this.service.getUserRoles(this.userId.trim())
       .pipe(finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
       .subscribe({
         next: data => { this.userRoles = data; this.applySearch(); },
-        error: () => { this.errorMsg = 'Failed to load data.'; }
+        error: () => { this.errorMsg = 'Failed to load roles.'; }
       });
   }
 
   applySearch(): void {
     const q = this.searchTerm.toLowerCase();
-    this.filtered = this.userRoles.filter(r =>
-      r.userId?.toLowerCase().includes(q) || r.roleId?.toLowerCase().includes(q)
-    );
+    this.filtered = this.userRoles.filter(r => r.roleId?.toLowerCase().includes(q));
   }
 
-  openCreate(): void { this.form = {}; this.showModal = true; }
+  openAdd(): void { this.form = { roleId: '' }; this.showModal = true; }
 
   save(): void {
-    this.service.create(this.form).subscribe({
+    if (!this.userId.trim() || !this.form.roleId.trim()) return;
+    this.service.addUserToRole({ userId: this.userId.trim(), roleId: this.form.roleId.trim() }).subscribe({
       next: () => { this.showModal = false; this.load(); },
-      error: () => { this.errorMsg = 'Save failed.'; this.cdr.detectChanges(); }
+      error: () => { this.errorMsg = 'Add role failed.'; this.cdr.detectChanges(); }
     });
   }
 
-  delete(userId: string, roleId: string): void {
-    if (!confirm('Delete this record?')) return;
-    this.service.delete(userId, roleId).subscribe({
+  remove(roleId: string): void {
+    if (!confirm('Remove this role from user?')) return;
+    this.service.removeUserFromRole({ userId: this.userId.trim(), roleId }).subscribe({
       next: () => this.load(),
-      error: () => { this.errorMsg = 'Delete failed.'; this.cdr.detectChanges(); }
+      error: () => { this.errorMsg = 'Remove failed.'; this.cdr.detectChanges(); }
     });
   }
 

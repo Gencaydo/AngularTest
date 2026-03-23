@@ -5,27 +5,19 @@ import { AspNetUserClaim } from '../models/asp-net-user-claim.model';
 
 @Injectable({ providedIn: 'root' })
 export class AspNetUserClaimsService {
-  private controller = 'AspNetUserClaims';
+  private controller = 'User';
 
   constructor(private api: ApiService) {}
 
-  getAll(): Observable<AspNetUserClaim[]> {
-    return this.api.get<AspNetUserClaim[]>(this.controller);
+  getClaims(userId: string): Observable<AspNetUserClaim[]> {
+    return this.api.get<AspNetUserClaim[]>(this.controller, `GetUserClaims/${userId}`);
   }
 
-  getById(id: number): Observable<AspNetUserClaim> {
-    return this.api.get<AspNetUserClaim>(this.controller, String(id));
+  addClaim(claim: { userId: string; claimType: string; claimValue: string }): Observable<AspNetUserClaim> {
+    return this.api.post<AspNetUserClaim>(this.controller, 'AddUserClaim', claim);
   }
 
-  create(claim: Partial<AspNetUserClaim>): Observable<AspNetUserClaim> {
-    return this.api.post<AspNetUserClaim>(this.controller, undefined, claim);
-  }
-
-  update(id: number, claim: Partial<AspNetUserClaim>): Observable<AspNetUserClaim> {
-    return this.api.put<AspNetUserClaim>(this.controller, String(id), claim);
-  }
-
-  delete(id: number): Observable<void> {
-    return this.api.delete<void>(this.controller, String(id));
+  removeClaim(claim: { userId: string; claimType: string; claimValue: string }): Observable<void> {
+    return this.api.delete<void>(this.controller, 'RemoveUserClaim', claim);
   }
 }

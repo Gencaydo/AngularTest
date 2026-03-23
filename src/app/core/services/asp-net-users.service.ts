@@ -5,27 +5,15 @@ import { AspNetUser } from '../models/asp-net-user.model';
 
 @Injectable({ providedIn: 'root' })
 export class AspNetUsersService {
-  private controller = 'AspNetUsers';
+  private controller = 'User';
 
   constructor(private api: ApiService) {}
 
   getAll(): Observable<AspNetUser[]> {
-    return this.api.get<AspNetUser[]>(this.controller);
-  }
-
-  getById(id: string): Observable<AspNetUser> {
-    return this.api.get<AspNetUser>(this.controller, id);
-  }
-
-  create(user: Partial<AspNetUser>): Observable<AspNetUser> {
-    return this.api.post<AspNetUser>(this.controller, undefined, user);
-  }
-
-  update(id: string, user: Partial<AspNetUser>): Observable<AspNetUser> {
-    return this.api.put<AspNetUser>(this.controller, id, user);
+    return this.api.get<AspNetUser[]>(this.controller, 'GetAllUsers');
   }
 
   delete(id: string): Observable<void> {
-    return this.api.delete<void>(this.controller, id);
+    return this.api.delete<void>(this.controller, `DeleteUser/${id}`);
   }
 }

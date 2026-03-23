@@ -5,27 +5,19 @@ import { AspNetRoleClaim } from '../models/asp-net-role-claim.model';
 
 @Injectable({ providedIn: 'root' })
 export class AspNetRoleClaimsService {
-  private controller = 'AspNetRoleClaims';
+  private controller = 'Role';
 
   constructor(private api: ApiService) {}
 
-  getAll(): Observable<AspNetRoleClaim[]> {
-    return this.api.get<AspNetRoleClaim[]>(this.controller);
+  getClaims(roleId: string): Observable<AspNetRoleClaim[]> {
+    return this.api.get<AspNetRoleClaim[]>(this.controller, `GetClaims/${roleId}`);
   }
 
-  getById(id: number): Observable<AspNetRoleClaim> {
-    return this.api.get<AspNetRoleClaim>(this.controller, String(id));
+  addClaim(roleId: string, claim: { claimType: string; claimValue: string }): Observable<AspNetRoleClaim> {
+    return this.api.post<AspNetRoleClaim>(this.controller, `AddClaim/${roleId}`, claim);
   }
 
-  create(claim: Partial<AspNetRoleClaim>): Observable<AspNetRoleClaim> {
-    return this.api.post<AspNetRoleClaim>(this.controller, undefined, claim);
-  }
-
-  update(id: number, claim: Partial<AspNetRoleClaim>): Observable<AspNetRoleClaim> {
-    return this.api.put<AspNetRoleClaim>(this.controller, String(id), claim);
-  }
-
-  delete(id: number): Observable<void> {
-    return this.api.delete<void>(this.controller, String(id));
+  removeClaim(roleId: string, claim: { claimType: string; claimValue: string }): Observable<void> {
+    return this.api.delete<void>(this.controller, `RemoveClaim/${roleId}`, claim);
   }
 }

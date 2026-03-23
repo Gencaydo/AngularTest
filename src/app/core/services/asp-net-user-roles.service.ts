@@ -5,23 +5,19 @@ import { AspNetUserRole } from '../models/asp-net-user-role.model';
 
 @Injectable({ providedIn: 'root' })
 export class AspNetUserRolesService {
-  private controller = 'AspNetUserRoles';
+  private controller = 'User';
 
   constructor(private api: ApiService) {}
 
-  getAll(): Observable<AspNetUserRole[]> {
-    return this.api.get<AspNetUserRole[]>(this.controller);
+  getUserRoles(userId: string): Observable<AspNetUserRole[]> {
+    return this.api.get<AspNetUserRole[]>(this.controller, `GetUserRoles/${userId}`);
   }
 
-  getByKey(userId: string, roleId: string): Observable<AspNetUserRole> {
-    return this.api.get<AspNetUserRole>(this.controller, `${userId}/${roleId}`);
+  addUserToRole(data: { userId: string; roleId: string }): Observable<void> {
+    return this.api.post<void>(this.controller, 'AddUserToRole', data);
   }
 
-  create(userRole: Partial<AspNetUserRole>): Observable<AspNetUserRole> {
-    return this.api.post<AspNetUserRole>(this.controller, undefined, userRole);
-  }
-
-  delete(userId: string, roleId: string): Observable<void> {
-    return this.api.delete<void>(this.controller, `${userId}/${roleId}`);
+  removeUserFromRole(data: { userId: string; roleId: string }): Observable<void> {
+    return this.api.delete<void>(this.controller, 'RemoveUserFromRole', data);
   }
 }

@@ -5,27 +5,15 @@ import { AspNetUserLogin } from '../models/asp-net-user-login.model';
 
 @Injectable({ providedIn: 'root' })
 export class AspNetUserLoginsService {
-  private controller = 'AspNetUserLogins';
+  private controller = 'User';
 
   constructor(private api: ApiService) {}
 
-  getAll(): Observable<AspNetUserLogin[]> {
-    return this.api.get<AspNetUserLogin[]>(this.controller);
+  getUserLogins(userId: string): Observable<AspNetUserLogin[]> {
+    return this.api.get<AspNetUserLogin[]>(this.controller, `GetUserLogins/${userId}`);
   }
 
-  getByKey(loginProvider: string, providerKey: string): Observable<AspNetUserLogin> {
-    return this.api.get<AspNetUserLogin>(this.controller, `${loginProvider}/${providerKey}`);
-  }
-
-  create(login: Partial<AspNetUserLogin>): Observable<AspNetUserLogin> {
-    return this.api.post<AspNetUserLogin>(this.controller, undefined, login);
-  }
-
-  update(loginProvider: string, providerKey: string, login: Partial<AspNetUserLogin>): Observable<AspNetUserLogin> {
-    return this.api.put<AspNetUserLogin>(this.controller, `${loginProvider}/${providerKey}`, login);
-  }
-
-  delete(loginProvider: string, providerKey: string): Observable<void> {
-    return this.api.delete<void>(this.controller, `${loginProvider}/${providerKey}`);
+  removeUserLogin(userId: string, provider: string, key: string): Observable<void> {
+    return this.api.delete<void>(this.controller, `RemoveUserLogin/${userId}/${provider}/${key}`);
   }
 }

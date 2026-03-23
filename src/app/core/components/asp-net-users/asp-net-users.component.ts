@@ -19,10 +19,6 @@ export class AspNetUsersComponent implements OnInit {
   loading = false;
   errorMsg = '';
 
-  showModal = false;
-  isEdit = false;
-  form: Partial<AspNetUser> = {};
-
   constructor(private service: AspNetUsersService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void { this.load(); }
@@ -34,7 +30,7 @@ export class AspNetUsersComponent implements OnInit {
       .pipe(finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
       .subscribe({
         next: data => { this.users = data; this.applySearch(); },
-        error: () => { this.errorMsg = 'Failed to load data.'; }
+        error: () => { this.errorMsg = 'Failed to load users.'; }
       });
   }
 
@@ -45,20 +41,6 @@ export class AspNetUsersComponent implements OnInit {
     );
   }
 
-  openCreate(): void { this.isEdit = false; this.form = { emailConfirmed: false, phoneNumberConfirmed: false, twoFactorEnabled: false, lockoutEnabled: false, accessFailedCount: 0 }; this.showModal = true; }
-
-  openEdit(row: AspNetUser): void { this.isEdit = true; this.form = { ...row }; this.showModal = true; }
-
-  save(): void {
-    const action = this.isEdit
-      ? this.service.update(this.form.id!, this.form)
-      : this.service.create(this.form);
-    action.subscribe({
-      next: () => { this.showModal = false; this.load(); },
-      error: () => { this.errorMsg = 'Save failed.'; this.cdr.detectChanges(); }
-    });
-  }
-
   delete(id: string): void {
     if (!confirm('Delete this user?')) return;
     this.service.delete(id).subscribe({
@@ -66,6 +48,4 @@ export class AspNetUsersComponent implements OnInit {
       error: () => { this.errorMsg = 'Delete failed.'; this.cdr.detectChanges(); }
     });
   }
-
-  closeModal(): void { this.showModal = false; }
 }
