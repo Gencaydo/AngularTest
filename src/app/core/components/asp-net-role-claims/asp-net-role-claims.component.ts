@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs';
 import { AspNetRoleClaim } from '../../models/asp-net-role-claim.model';
 import { AspNetRoleClaimsService } from '../../services/asp-net-role-claims.service';
 
@@ -22,17 +23,19 @@ export class AspNetRoleClaimsComponent implements OnInit {
   isEdit = false;
   form: Partial<AspNetRoleClaim> = {};
 
-  constructor(private service: AspNetRoleClaimsService) {}
+  constructor(private service: AspNetRoleClaimsService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void { this.load(); }
 
   load(): void {
     this.loading = true;
     this.errorMsg = '';
-    this.service.getAll().subscribe({
-      next: data => { this.claims = data; this.applySearch(); this.loading = false; },
-      error: () => { this.errorMsg = 'Failed to load data.'; this.loading = false; }
-    });
+    this.service.getAll()
+      .pipe(finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: data => { this.claims = data; this.applySearch(); },
+        error: () => { this.errorMsg = 'Failed to load data.'; }
+      });
   }
 
   applySearch(): void {
@@ -45,19 +48,24 @@ export class AspNetRoleClaimsComponent implements OnInit {
   }
 
   openCreate(): void { this.isEdit = false; this.form = {}; this.showModal = true; }
-
   openEdit(row: AspNetRoleClaim): void { this.isEdit = true; this.form = { ...row }; this.showModal = true; }
 
   save(): void {
     const action = this.isEdit
       ? this.service.update(this.form.id!, this.form)
       : this.service.create(this.form);
-    action.subscribe({ next: () => { this.showModal = false; this.load(); }, error: () => { this.errorMsg = 'Save failed.'; } });
+    action.subscribe({
+      next: () => { this.showModal = false; this.load(); },
+      error: () => { this.errorMsg = 'Save failed.'; this.cdr.detectChanges(); }
+    });
   }
 
   delete(id: number): void {
     if (!confirm('Delete this record?')) return;
-    this.service.delete(id).subscribe({ next: () => this.load(), error: () => { this.errorMsg = 'Delete failed.'; } });
+    this.service.delete(id).subscribe({
+      next: () => this.load(),
+      error: () => { this.errorMsg = 'Delete failed.'; this.cdr.detectChanges(); }
+    });
   }
 
   closeModal(): void { this.showModal = false; }

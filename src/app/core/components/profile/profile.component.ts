@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { UserProfileService } from '../../services/user-profile.service';
 import { UserProfile } from '../../models/user-profile.model';
 import { Router } from '@angular/router';
 import { ApiResponse } from '../../models/api-response.model';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -30,7 +31,8 @@ export class ProfileComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private userProfileService: UserProfileService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     this.profileForm = this.formBuilder.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
@@ -47,85 +49,69 @@ export class ProfileComponent implements OnInit {
   loadUserProfile() {
     this.loading = true;
     this.errorMessage = '';
-    this.userProfileService.getUserProfile().subscribe({
-      next: (response: ApiResponse<UserProfile>) => {
-        console.log('Profile response:', response);
-        if (response && response.data) {
-          const userData = response.data;
-          this.profileForm.patchValue({
-            firstName: userData.firstName || '',
-            lastName: userData.lastName || '',
-            email: userData.email || '',
-            mobilePhoneNumber: userData.mobilePhoneNumber || ''
-          });
-          this.userName = userData.userName || '';
-          this.email = userData.email || '';
-          this.profileImage = userData.profileImage || this.defaultProfileImage;
-          this.lastUpdated = this.formatDate(new Date());
+    this.userProfileService.getUserProfile()
+      .pipe(finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: (response: ApiResponse<UserProfile>) => {
+          if (response?.data) {
+            const userData = response.data;
+            this.profileForm.patchValue({
+              firstName: userData.firstName || '',
+              lastName: userData.lastName || '',
+              email: userData.email || '',
+              mobilePhoneNumber: userData.mobilePhoneNumber || ''
+            });
+            this.userName = userData.userName || '';
+            this.email = userData.email || '';
+            this.profileImage = userData.profileImage || this.defaultProfileImage;
+            this.lastUpdated = this.formatDate(new Date());
+          }
+        },
+        error: () => {
+          this.showMessage('Error loading profile. Please try again.', 'error');
         }
-        this.loading = false;
-      },
-      error: (error: Error) => {
-        console.error('Error loading profile:', error);
-        this.showMessage('Error loading profile', 'error');
-        this.loading = false;
-      }
-    });
+      });
   }
 
   onSubmit() {
     if (this.profileForm.valid) {
       this.loading = true;
       this.errorMessage = '';
-      
-      // Get the form values including disabled fields
+
       const formData = this.profileForm.getRawValue();
-      
-      // Create the update payload
       const updateData = {
         firstName: formData.firstName,
         lastName: formData.lastName,
-        email: formData.email, // Include the email from the disabled field
+        email: formData.email,
         mobilePhoneNumber: formData.mobilePhoneNumber
       };
 
-      console.log('Updating profile with data:', updateData);
-
-      this.userProfileService.updateUserProfile(updateData).subscribe({
-        next: (response) => {
-          console.log('Profile update success:', response);
-          // Don't show message in the message container for success
-          this.loading = false;
-          // Update the last updated date
-          this.lastUpdated = this.formatDate(new Date());
-          
-          // Show the success overlay
-          this.showSuccessOverlay = true;
-          setTimeout(() => {
-            this.showSuccessOverlay = false;
-          }, 2000); // Reduced to 2 seconds for the smaller box
-          
-          // Reload user profile to get the latest data
-          this.loadUserProfile();
-        },
-        error: (error) => {
-          console.error('Error updating profile:', error);
-          this.showMessage('Error updating profile: ' + (error.message || 'Unknown error'), 'error');
-          this.loading = false;
-        }
-      });
+      this.userProfileService.updateUserProfile(updateData)
+        .pipe(finalize(() => { this.cdr.detectChanges(); }))
+        .subscribe({
+          next: () => {
+            this.lastUpdated = this.formatDate(new Date());
+            this.showSuccessOverlay = true;
+            setTimeout(() => {
+              this.showSuccessOverlay = false;
+              this.cdr.detectChanges();
+            }, 2000);
+            // loadUserProfile manages this.loading itself
+            this.loadUserProfile();
+          },
+          error: (error: unknown) => {
+            const msg = Array.isArray(error) ? error.join(', ')
+              : (error instanceof Error ? error.message : 'Unknown error');
+            this.showMessage('Error updating profile: ' + msg, 'error');
+            this.loading = false;
+            this.cdr.detectChanges();
+          }
+        });
     } else {
-      // Clear any previous success messages
       this.errorMessage = '';
-      
-      // Mark all fields as touched to show validation errors
       Object.keys(this.profileForm.controls).forEach(key => {
-        const control = this.profileForm.get(key);
-        if (control) {
-          control.markAsTouched();
-        }
+        this.profileForm.get(key)?.markAsTouched();
       });
-      
       this.showMessage('Please fix the validation errors before submitting', 'error');
     }
   }
@@ -135,24 +121,13 @@ export class ProfileComponent implements OnInit {
   }
 
   showMessage(message: string, type: 'success' | 'error') {
-    console.log(`Showing ${type} message:`, message);
     this.errorMessage = message;
     this.messageType = type;
-    
-    // Force the message to be visible for at least 5 seconds
+    this.cdr.detectChanges();
     setTimeout(() => {
-      console.log('Message timeout reached');
       this.errorMessage = '';
+      this.cdr.detectChanges();
     }, 5000);
-    
-    // For debugging - log the state after 1 second
-    setTimeout(() => {
-      console.log('Message state after 1 second:', {
-        message: this.errorMessage,
-        type: this.messageType,
-        isVisible: !!this.errorMessage
-      });
-    }, 1000);
   }
 
   // Helper method to format dates

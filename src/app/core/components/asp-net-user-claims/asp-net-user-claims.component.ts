@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs';
 import { AspNetUserClaim } from '../../models/asp-net-user-claim.model';
 import { AspNetUserClaimsService } from '../../services/asp-net-user-claims.service';
 
@@ -22,16 +23,19 @@ export class AspNetUserClaimsComponent implements OnInit {
   isEdit = false;
   form: Partial<AspNetUserClaim> = {};
 
-  constructor(private service: AspNetUserClaimsService) {}
+  constructor(private service: AspNetUserClaimsService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void { this.load(); }
 
   load(): void {
     this.loading = true;
-    this.service.getAll().subscribe({
-      next: data => { this.claims = data; this.applySearch(); this.loading = false; },
-      error: () => { this.errorMsg = 'Failed to load data.'; this.loading = false; }
-    });
+    this.errorMsg = '';
+    this.service.getAll()
+      .pipe(finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: data => { this.claims = data; this.applySearch(); },
+        error: () => { this.errorMsg = 'Failed to load data.'; }
+      });
   }
 
   applySearch(): void {
@@ -48,12 +52,18 @@ export class AspNetUserClaimsComponent implements OnInit {
 
   save(): void {
     const action = this.isEdit ? this.service.update(this.form.id!, this.form) : this.service.create(this.form);
-    action.subscribe({ next: () => { this.showModal = false; this.load(); }, error: () => { this.errorMsg = 'Save failed.'; } });
+    action.subscribe({
+      next: () => { this.showModal = false; this.load(); },
+      error: () => { this.errorMsg = 'Save failed.'; this.cdr.detectChanges(); }
+    });
   }
 
   delete(id: number): void {
     if (!confirm('Delete this record?')) return;
-    this.service.delete(id).subscribe({ next: () => this.load(), error: () => { this.errorMsg = 'Delete failed.'; } });
+    this.service.delete(id).subscribe({
+      next: () => this.load(),
+      error: () => { this.errorMsg = 'Delete failed.'; this.cdr.detectChanges(); }
+    });
   }
 
   closeModal(): void { this.showModal = false; }

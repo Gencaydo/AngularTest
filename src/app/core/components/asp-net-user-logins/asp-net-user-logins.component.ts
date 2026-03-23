@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs';
 import { AspNetUserLogin } from '../../models/asp-net-user-login.model';
 import { AspNetUserLoginsService } from '../../services/asp-net-user-logins.service';
 
@@ -23,16 +24,19 @@ export class AspNetUserLoginsComponent implements OnInit {
   form: Partial<AspNetUserLogin> = {};
   editOriginal: { loginProvider: string; providerKey: string } | null = null;
 
-  constructor(private service: AspNetUserLoginsService) {}
+  constructor(private service: AspNetUserLoginsService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void { this.load(); }
 
   load(): void {
     this.loading = true;
-    this.service.getAll().subscribe({
-      next: data => { this.logins = data; this.applySearch(); this.loading = false; },
-      error: () => { this.errorMsg = 'Failed to load data.'; this.loading = false; }
-    });
+    this.errorMsg = '';
+    this.service.getAll()
+      .pipe(finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: data => { this.logins = data; this.applySearch(); },
+        error: () => { this.errorMsg = 'Failed to load data.'; }
+      });
   }
 
   applySearch(): void {
@@ -54,20 +58,21 @@ export class AspNetUserLoginsComponent implements OnInit {
   }
 
   save(): void {
-    if (this.isEdit && this.editOriginal) {
-      this.service.update(this.editOriginal.loginProvider, this.editOriginal.providerKey, this.form).subscribe({
-        next: () => { this.showModal = false; this.load(); }, error: () => { this.errorMsg = 'Save failed.'; }
-      });
-    } else {
-      this.service.create(this.form).subscribe({
-        next: () => { this.showModal = false; this.load(); }, error: () => { this.errorMsg = 'Save failed.'; }
-      });
-    }
+    const action = this.isEdit && this.editOriginal
+      ? this.service.update(this.editOriginal.loginProvider, this.editOriginal.providerKey, this.form)
+      : this.service.create(this.form);
+    action.subscribe({
+      next: () => { this.showModal = false; this.load(); },
+      error: () => { this.errorMsg = 'Save failed.'; this.cdr.detectChanges(); }
+    });
   }
 
   delete(loginProvider: string, providerKey: string): void {
     if (!confirm('Delete this record?')) return;
-    this.service.delete(loginProvider, providerKey).subscribe({ next: () => this.load(), error: () => { this.errorMsg = 'Delete failed.'; } });
+    this.service.delete(loginProvider, providerKey).subscribe({
+      next: () => this.load(),
+      error: () => { this.errorMsg = 'Delete failed.'; this.cdr.detectChanges(); }
+    });
   }
 
   closeModal(): void { this.showModal = false; }

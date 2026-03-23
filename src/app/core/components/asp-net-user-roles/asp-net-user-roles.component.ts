@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs';
 import { AspNetUserRole } from '../../models/asp-net-user-role.model';
 import { AspNetUserRolesService } from '../../services/asp-net-user-roles.service';
 
@@ -21,16 +22,19 @@ export class AspNetUserRolesComponent implements OnInit {
   showModal = false;
   form: Partial<AspNetUserRole> = {};
 
-  constructor(private service: AspNetUserRolesService) {}
+  constructor(private service: AspNetUserRolesService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void { this.load(); }
 
   load(): void {
     this.loading = true;
-    this.service.getAll().subscribe({
-      next: data => { this.userRoles = data; this.applySearch(); this.loading = false; },
-      error: () => { this.errorMsg = 'Failed to load data.'; this.loading = false; }
-    });
+    this.errorMsg = '';
+    this.service.getAll()
+      .pipe(finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: data => { this.userRoles = data; this.applySearch(); },
+        error: () => { this.errorMsg = 'Failed to load data.'; }
+      });
   }
 
   applySearch(): void {
@@ -45,13 +49,16 @@ export class AspNetUserRolesComponent implements OnInit {
   save(): void {
     this.service.create(this.form).subscribe({
       next: () => { this.showModal = false; this.load(); },
-      error: () => { this.errorMsg = 'Save failed.'; }
+      error: () => { this.errorMsg = 'Save failed.'; this.cdr.detectChanges(); }
     });
   }
 
   delete(userId: string, roleId: string): void {
     if (!confirm('Delete this record?')) return;
-    this.service.delete(userId, roleId).subscribe({ next: () => this.load(), error: () => { this.errorMsg = 'Delete failed.'; } });
+    this.service.delete(userId, roleId).subscribe({
+      next: () => this.load(),
+      error: () => { this.errorMsg = 'Delete failed.'; this.cdr.detectChanges(); }
+    });
   }
 
   closeModal(): void { this.showModal = false; }

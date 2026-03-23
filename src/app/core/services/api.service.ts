@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -13,8 +13,21 @@ export class ApiService {
 
   constructor(
     private http: HttpClient,
-    private authState: AuthStateService
+    private authState: AuthStateService,
+    private ngZone: NgZone
   ) {}
+
+  // Ensures every emission (next/error/complete) runs inside Angular's zone
+  // so change detection triggers automatically in all components.
+  private runInZone<T>(): (source: Observable<T>) => Observable<T> {
+    return (source) => new Observable<T>(observer => {
+      return source.subscribe({
+        next: (value) => this.ngZone.run(() => observer.next(value)),
+        error: (err)  => this.ngZone.run(() => observer.error(err)),
+        complete: ()  => this.ngZone.run(() => observer.complete())
+      });
+    });
+  }
 
   private getHeaders(): HttpHeaders {
     let headers = new HttpHeaders({
@@ -44,7 +57,7 @@ export class ApiService {
         headers: this.getHeaders(),
         params
       })
-      .pipe(catchError((err) => this.handleError(err)));
+      .pipe(catchError((err) => this.handleError(err)), this.runInZone());
   }
 
   post<T>(controller: string, action?: string, body: any = {}): Observable<T> {
@@ -52,7 +65,7 @@ export class ApiService {
       .post<T>(this.createUrl(controller, action), body, {
         headers: this.getHeaders()
       })
-      .pipe(catchError((err) => this.handleError(err)));
+      .pipe(catchError((err) => this.handleError(err)), this.runInZone());
   }
 
   put<T>(controller: string, action?: string, body: any = {}): Observable<T> {
@@ -60,7 +73,7 @@ export class ApiService {
       .put<T>(this.createUrl(controller, action), body, {
         headers: this.getHeaders()
       })
-      .pipe(catchError((err) => this.handleError(err)));
+      .pipe(catchError((err) => this.handleError(err)), this.runInZone());
   }
 
   delete<T>(controller: string, action?: string, body: any = {}): Observable<T> {
@@ -69,7 +82,7 @@ export class ApiService {
         headers: this.getHeaders(),
         body
       })
-      .pipe(catchError((err) => this.handleError(err)));
+      .pipe(catchError((err) => this.handleError(err)), this.runInZone());
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {

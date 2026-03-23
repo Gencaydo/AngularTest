@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs';
 import { UserRefreshToken } from '../../models/user-refresh-token.model';
 import { UserRefreshTokensService } from '../../services/user-refresh-tokens.service';
 
@@ -18,16 +19,19 @@ export class UserRefreshTokensComponent implements OnInit {
   loading = false;
   errorMsg = '';
 
-  constructor(private service: UserRefreshTokensService) {}
+  constructor(private service: UserRefreshTokensService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void { this.load(); }
 
   load(): void {
     this.loading = true;
-    this.service.getAll().subscribe({
-      next: data => { this.tokens = data; this.applySearch(); this.loading = false; },
-      error: () => { this.errorMsg = 'Failed to load data.'; this.loading = false; }
-    });
+    this.errorMsg = '';
+    this.service.getAll()
+      .pipe(finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: data => { this.tokens = data; this.applySearch(); },
+        error: () => { this.errorMsg = 'Failed to load data.'; }
+      });
   }
 
   applySearch(): void {
@@ -39,11 +43,17 @@ export class UserRefreshTokensComponent implements OnInit {
 
   revoke(id: number): void {
     if (!confirm('Revoke this token?')) return;
-    this.service.revoke(id).subscribe({ next: () => this.load(), error: () => { this.errorMsg = 'Revoke failed.'; } });
+    this.service.revoke(id).subscribe({
+      next: () => this.load(),
+      error: () => { this.errorMsg = 'Revoke failed.'; this.cdr.detectChanges(); }
+    });
   }
 
   delete(id: number): void {
     if (!confirm('Delete this token?')) return;
-    this.service.delete(id).subscribe({ next: () => this.load(), error: () => { this.errorMsg = 'Delete failed.'; } });
+    this.service.delete(id).subscribe({
+      next: () => this.load(),
+      error: () => { this.errorMsg = 'Delete failed.'; this.cdr.detectChanges(); }
+    });
   }
 }

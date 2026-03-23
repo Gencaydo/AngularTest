@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs';
 import { AspNetUser } from '../../models/asp-net-user.model';
 import { AspNetUsersService } from '../../services/asp-net-users.service';
 
@@ -22,17 +23,19 @@ export class AspNetUsersComponent implements OnInit {
   isEdit = false;
   form: Partial<AspNetUser> = {};
 
-  constructor(private service: AspNetUsersService) {}
+  constructor(private service: AspNetUsersService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void { this.load(); }
 
   load(): void {
     this.loading = true;
     this.errorMsg = '';
-    this.service.getAll().subscribe({
-      next: data => { this.users = data; this.applySearch(); this.loading = false; },
-      error: () => { this.errorMsg = 'Failed to load data.'; this.loading = false; }
-    });
+    this.service.getAll()
+      .pipe(finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: data => { this.users = data; this.applySearch(); },
+        error: () => { this.errorMsg = 'Failed to load data.'; }
+      });
   }
 
   applySearch(): void {
@@ -50,12 +53,18 @@ export class AspNetUsersComponent implements OnInit {
     const action = this.isEdit
       ? this.service.update(this.form.id!, this.form)
       : this.service.create(this.form);
-    action.subscribe({ next: () => { this.showModal = false; this.load(); }, error: () => { this.errorMsg = 'Save failed.'; } });
+    action.subscribe({
+      next: () => { this.showModal = false; this.load(); },
+      error: () => { this.errorMsg = 'Save failed.'; this.cdr.detectChanges(); }
+    });
   }
 
   delete(id: string): void {
     if (!confirm('Delete this user?')) return;
-    this.service.delete(id).subscribe({ next: () => this.load(), error: () => { this.errorMsg = 'Delete failed.'; } });
+    this.service.delete(id).subscribe({
+      next: () => this.load(),
+      error: () => { this.errorMsg = 'Delete failed.'; this.cdr.detectChanges(); }
+    });
   }
 
   closeModal(): void { this.showModal = false; }
