@@ -1,15 +1,25 @@
 <div class="page-container">
   <div class="page-header">
-    <h2>AspNet User Logins</h2>
-    <button class="btn-primary" (click)="openCreate()">+ Add Login</button>
+    <h2>User Logins</h2>
   </div>
+
+  <div class="filter-bar">
+    <input type="text" placeholder="Enter User ID..." [(ngModel)]="userId" />
+    <button class="btn-load" (click)="load()" [disabled]="!userId.trim()">Load</button>
+  </div>
+
   <div class="error-msg" *ngIf="errorMsg">{{ errorMsg }}</div>
-  <div class="search-bar">
-    <input type="text" placeholder="Search by userId or provider..." [(ngModel)]="searchTerm" (input)="applySearch()" />
+
+  <div class="search-bar" *ngIf="logins.length > 0">
+    <input type="text" placeholder="Search by provider or display name..." [(ngModel)]="searchTerm" (input)="applySearch()" />
   </div>
+
   <div class="table-card">
     <div class="loading" *ngIf="loading">Loading...</div>
-    <div class="table-wrapper" *ngIf="!loading">
+    <div class="empty-state" *ngIf="!loading && !userId.trim()">
+      <p>Enter a User ID above and click Load to view logins.</p>
+    </div>
+    <div class="table-wrapper" *ngIf="!loading && userId.trim()">
       <table>
         <thead>
           <tr>
@@ -27,41 +37,14 @@
             <td>{{ row.providerDisplayName }}</td>
             <td [title]="row.userId">{{ row.userId }}</td>
             <td class="actions">
-              <button class="btn-edit" (click)="openEdit(row)">Edit</button>
-              <button class="btn-delete" (click)="delete(row.loginProvider, row.providerKey)">Delete</button>
+              <button class="btn-delete" (click)="remove(row)">Remove</button>
             </td>
           </tr>
           <tr *ngIf="filtered.length === 0">
-            <td colspan="5"><div class="empty-state"><p>No records found.</p></div></td>
+            <td colspan="5"><div class="empty-state"><p>No logins found for this user.</p></div></td>
           </tr>
         </tbody>
       </table>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
-  <div class="modal" (click)="$event.stopPropagation()">
-    <h3>{{ isEdit ? 'Edit Login' : 'Add Login' }}</h3>
-    <div class="form-group">
-      <label>Login Provider</label>
-      <input type="text" [(ngModel)]="form.loginProvider" [disabled]="isEdit" />
-    </div>
-    <div class="form-group">
-      <label>Provider Key</label>
-      <input type="text" [(ngModel)]="form.providerKey" [disabled]="isEdit" />
-    </div>
-    <div class="form-group">
-      <label>Display Name</label>
-      <input type="text" [(ngModel)]="form.providerDisplayName" />
-    </div>
-    <div class="form-group">
-      <label>User ID</label>
-      <input type="text" [(ngModel)]="form.userId" />
-    </div>
-    <div class="modal-actions">
-      <button class="btn-cancel" (click)="closeModal()">Cancel</button>
-      <button class="btn-save" (click)="save()">{{ isEdit ? 'Update' : 'Create' }}</button>
     </div>
   </div>
 </div>

@@ -1,6 +1,6 @@
 <div class="page-container">
   <div class="page-header">
-    <h2>AspNet Users</h2>
+    <h2>Users</h2>
     <button class="btn-primary" (click)="openCreate()">+ Add User</button>
   </div>
   <div class="error-msg" *ngIf="errorMsg">{{ errorMsg }}</div>
@@ -57,9 +57,17 @@
       <label>Email</label>
       <input type="email" [(ngModel)]="form.email" />
     </div>
+    <div class="form-group" *ngIf="!isEdit">
+      <label>Password</label>
+      <input type="password" [(ngModel)]="form.passwordHash" placeholder="Enter password" />
+    </div>
     <div class="form-group">
       <label>Phone Number</label>
       <input type="text" [(ngModel)]="form.phoneNumber" />
+    </div>
+    <div class="form-group">
+      <label>First Name</label>
+      <input type="text" [(ngModel)]="form.normalizedUserName" placeholder="First name" />
     </div>
     <div class="form-group">
       <label>Email Confirmed</label>

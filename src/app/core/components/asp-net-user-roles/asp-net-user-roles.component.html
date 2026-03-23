@@ -1,15 +1,26 @@
 <div class="page-container">
   <div class="page-header">
-    <h2>AspNet User Roles</h2>
-    <button class="btn-primary" (click)="openCreate()">+ Assign Role</button>
+    <h2>User Roles</h2>
+    <button class="btn-primary" (click)="openAdd()" [disabled]="!userId.trim()">+ Assign Role</button>
   </div>
+
+  <div class="filter-bar">
+    <input type="text" placeholder="Enter User ID..." [(ngModel)]="userId" />
+    <button class="btn-load" (click)="load()" [disabled]="!userId.trim()">Load</button>
+  </div>
+
   <div class="error-msg" *ngIf="errorMsg">{{ errorMsg }}</div>
-  <div class="search-bar">
-    <input type="text" placeholder="Search by userId or roleId..." [(ngModel)]="searchTerm" (input)="applySearch()" />
+
+  <div class="search-bar" *ngIf="userRoles.length > 0">
+    <input type="text" placeholder="Search by role ID..." [(ngModel)]="searchTerm" (input)="applySearch()" />
   </div>
+
   <div class="table-card">
     <div class="loading" *ngIf="loading">Loading...</div>
-    <div class="table-wrapper" *ngIf="!loading">
+    <div class="empty-state" *ngIf="!loading && !userId.trim()">
+      <p>Enter a User ID above and click Load to view roles.</p>
+    </div>
+    <div class="table-wrapper" *ngIf="!loading && userId.trim()">
       <table>
         <thead>
           <tr>
@@ -23,11 +34,11 @@
             <td [title]="row.userId">{{ row.userId }}</td>
             <td [title]="row.roleId">{{ row.roleId }}</td>
             <td class="actions">
-              <button class="btn-delete" (click)="delete(row.userId, row.roleId)">Remove</button>
+              <button class="btn-delete" (click)="remove(row.roleId)">Remove</button>
             </td>
           </tr>
           <tr *ngIf="filtered.length === 0">
-            <td colspan="3"><div class="empty-state"><p>No records found.</p></div></td>
+            <td colspan="3"><div class="empty-state"><p>No roles found for this user.</p></div></td>
           </tr>
         </tbody>
       </table>
@@ -40,7 +51,7 @@
     <h3>Assign Role to User</h3>
     <div class="form-group">
       <label>User ID</label>
-      <input type="text" [(ngModel)]="form.userId" />
+      <input type="text" [value]="userId" disabled />
     </div>
     <div class="form-group">
       <label>Role ID</label>

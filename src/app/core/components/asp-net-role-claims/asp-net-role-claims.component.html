@@ -1,20 +1,29 @@
 <div class="page-container">
   <div class="page-header">
-    <h2>AspNet Role Claims</h2>
-    <button class="btn-primary" (click)="openCreate()">+ Add Claim</button>
+    <h2>Role Claims</h2>
+    <button class="btn-primary" (click)="openAdd()" [disabled]="!roleId.trim()">+ Add Claim</button>
   </div>
+
+  <div class="filter-bar">
+    <input type="text" placeholder="Enter Role ID..." [(ngModel)]="roleId" />
+    <button class="btn-load" (click)="load()" [disabled]="!roleId.trim()">Load</button>
+  </div>
+
   <div class="error-msg" *ngIf="errorMsg">{{ errorMsg }}</div>
-  <div class="search-bar">
-    <input type="text" placeholder="Search by roleId, claim type or value..." [(ngModel)]="searchTerm" (input)="applySearch()" />
+
+  <div class="search-bar" *ngIf="claims.length > 0">
+    <input type="text" placeholder="Search by claim type or value..." [(ngModel)]="searchTerm" (input)="applySearch()" />
   </div>
+
   <div class="table-card">
     <div class="loading" *ngIf="loading">Loading...</div>
-    <div class="table-wrapper" *ngIf="!loading">
+    <div class="empty-state" *ngIf="!loading && !roleId.trim()">
+      <p>Enter a Role ID above and click Load to view claims.</p>
+    </div>
+    <div class="table-wrapper" *ngIf="!loading && roleId.trim()">
       <table>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Role ID</th>
             <th>Claim Type</th>
             <th>Claim Value</th>
             <th>Actions</th>
@@ -22,17 +31,14 @@
         </thead>
         <tbody>
           <tr *ngFor="let row of filtered">
-            <td>{{ row.id }}</td>
-            <td [title]="row.roleId">{{ row.roleId }}</td>
             <td>{{ row.claimType }}</td>
             <td>{{ row.claimValue }}</td>
             <td class="actions">
-              <button class="btn-edit" (click)="openEdit(row)">Edit</button>
-              <button class="btn-delete" (click)="delete(row.id)">Delete</button>
+              <button class="btn-delete" (click)="remove(row)">Remove</button>
             </td>
           </tr>
           <tr *ngIf="filtered.length === 0">
-            <td colspan="5"><div class="empty-state"><p>No records found.</p></div></td>
+            <td colspan="3"><div class="empty-state"><p>No claims found for this role.</p></div></td>
           </tr>
         </tbody>
       </table>
@@ -42,10 +48,10 @@
 
 <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
   <div class="modal" (click)="$event.stopPropagation()">
-    <h3>{{ isEdit ? 'Edit Role Claim' : 'Add Role Claim' }}</h3>
+    <h3>Add Claim to Role</h3>
     <div class="form-group">
       <label>Role ID</label>
-      <input type="text" [(ngModel)]="form.roleId" />
+      <input type="text" [value]="roleId" disabled />
     </div>
     <div class="form-group">
       <label>Claim Type</label>
@@ -57,7 +63,7 @@
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" (click)="closeModal()">Cancel</button>
-      <button class="btn-save" (click)="save()">{{ isEdit ? 'Update' : 'Create' }}</button>
+      <button class="btn-save" (click)="save()">Add</button>
     </div>
   </div>
 </div>
